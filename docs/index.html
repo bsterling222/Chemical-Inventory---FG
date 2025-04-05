@@ -56,27 +56,7 @@
         		<button onclick="inventoryAudit()">📦 Inventory Audit</button>
     		</div>
 
-    <!-- Search Button -->
-		<div class="search-chemicals" id="search-chemicals" style="display: none; margin-top: 30px;">
-    			<h3>Search Chemicals</h3>
-			<button onclick="exitSearch()" style="margin-bottom: 10px;">🔙 Back to Menu</button>
-    			
-			<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
-  				<input
-    					type="text"
-    					id="search-input"
-    					placeholder="Search by name or CAS"
-    					oninput="performSearch()"
-    					style="flex: 1; min-width: 200px;"
-  				/>
-  				<button type="button" onclick="clearSearch()">❌ Clear</button>
-			</div>
-			<button onclick="scanBarcode()">📷 Scan Barcode</button>
-			<button onclick="generateLabels()" style="margin-top: 15px;">
-    			🏷️ Generate Labels
-			</button>
-    			<ul id="search-results"></ul>
-		</div>
+  
 
    <!-- Upload Excel -->
 		<div style="margin-top: 40px;">
@@ -98,6 +78,30 @@
 			</button>
 		</div>
     	</div>
+
+	</div>
+		  <!-- Search Button -->
+		<div class="search-chemicals" id="search-chemicals" style="display: none; margin-top: 30px;">
+    			<h3>Search Chemicals</h3>
+			<button onclick="exitSearch()" style="margin-bottom: 10px;">🔙 Back to Menu</button>
+    			
+			<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+  				<input
+    					type="text"
+    					id="search-input"
+    					placeholder="Search by name or CAS"
+    					oninput="performSearch()"
+    					style="flex: 1; min-width: 200px;"
+  				/>
+  				<button type="button" onclick="clearSearch()">❌ Clear</button>
+			</div>
+			<button onclick="scanBarcode()">📷 Scan Barcode</button>
+			<button onclick="generateLabels()" style="margin-top: 15px;">
+    			🏷️ Generate Labels
+			</button>
+    			<ul id="search-results"></ul>
+		</div>
+	</div>
 
     <!-- Scripts -->
 	<script>
