@@ -53,7 +53,7 @@
         	
 		<div class="actions-container">
         		<button onclick="searchChemicals()">🔍 Search Chemicals</button>
-        		<button onclick="startAudit()">📦 Inventory Audit</button>
+        		<button onclick="audit-section()">📦 Inventory Audit</button>
     		</div>
 
   
@@ -593,7 +593,7 @@
         		JsBarcode(barcodeSvg, item["Barcode"], {
            			format: "CODE128",
             			displayValue: false,
-            			height: 20,
+            			height: 15,
             			width: 1.5,
             			margin: 0
         		});
@@ -632,9 +632,6 @@
         		centerText(doc, infoLine, x, labelWidth, y + 10);
 
         		doc.addImage(barcodeDataUrl, "PNG", x + (labelWidth - 50) / 2, y + 13, 50, 10);
-
-        		doc.setFontSize(9);
-        		centerText(doc, item["Barcode"], x, labelWidth, y + 24);
 
         		if ((i + 1) % 30 === 0 && i + 1 < labelData.length) {
            			doc.addPage();
