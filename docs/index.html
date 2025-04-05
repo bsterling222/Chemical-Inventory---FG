@@ -41,7 +41,7 @@
 	</header>
 
     <!-- Login Section -->
-	<div class="login-container">
+	<div id="login-selection" class="login-container">
 		<h2>Login</h2>
 		<input type="text" id="username" placeholder="Name:" />
 		<button onclick="loginUser()">Login</button>
@@ -91,7 +91,8 @@
     <!-- Scripts -->
 	<script>
 
-	
+	let workingData = []; // stores uploaded data + barcodes
+
 
 	// Sample chemicalData (optional/fallback)
     	let chemicalData = [
@@ -196,7 +197,8 @@
 		buttonContainer.appendChild(deselectAllBtn);
 
     		table.appendChild(tbody);
-    		preview.appendChild(table);
+    		preview.appendChild(buttonContainer);
+		preview.appendChild(table);
 
 	}
 
@@ -437,7 +439,7 @@
         		const match = workingData.find(item => (item["Barcode"] || "").toString() === code);
 
         		if (match) {
-            			auditStatus[barcode] = {
+            			auditStatus[code] = {
     					user: currentUsername,
     					time: new Date().toLocaleString()
 				};
@@ -618,11 +620,10 @@
 
 
 	if ('serviceWorker' in navigator) {
-  		navigator.serviceWorker.register('service-worker.js')
-    			.then(() => console.log("✅ Service Worker Registered"))
-    			.catch(err => console.error("❌ SW Error:", err));
+ 		navigator.serviceWorker.register('service-worker.js').then(() => {
+    			console.log("✅ Service Worker Registered");
+  		});
 	}
-
 	</script>
 
 <!-- Hidden SVG container used for generating barcodes -->
