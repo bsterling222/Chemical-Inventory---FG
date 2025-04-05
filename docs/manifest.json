@@ -1,7 +1,7 @@
 {
   "name": "Chemical Inventory",
   "short_name": "Chemical Inventory",
-  "start_url": "./Chemical_Inventories/",
+  "start_url": ".docs/Chemical_Inventories",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#333333",
