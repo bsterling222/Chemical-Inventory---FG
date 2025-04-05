@@ -60,13 +60,13 @@
 		<div style="margin-top: 40px;">
     			<h3>Upload Chemical Inventory Excel</h3>
     			<input type="file" id="excel-file" accept=".xlsx, .xls, .csv" onchange="handleFileUpload(event)" />
-    			<div id="excel-preview" style="margin-top: 20px;"></div>
 			<button onclick="downloadModifiedFile()" style="margin-top: 30px;">
     				💾 Download File with Barcodes
 			</button>
 			<button onclick="generateLabels()" style="margin-top: 30px;">
     			🏷️ Generate Labels
 			</button>
+			<div id="excel-preview" style="margin-top: 20px;"></div>
 		</div>
 
 	</div>
@@ -626,7 +626,7 @@
         		const mfr = item["Manufacturer"] || "N/A";
         		const amount = item["Amount"] || "";
         		const units = item["Units"] || "";
-        		const infoLine = `CAS: ${cas} | MFR: ${mfr} | ${amount} ${units}`;
+        		const infoLine = `CAS: ${cas} | MFR: ${mfr};
         		centerText(doc, infoLine, x, labelWidth, y + 10);
 
         		doc.addImage(barcodeDataUrl, "PNG", x + (labelWidth - 50) / 2, y + 13, 50, 10);
