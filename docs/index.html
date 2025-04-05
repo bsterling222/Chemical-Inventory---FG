@@ -12,7 +12,7 @@
 	<link rel="apple-touch-icon" href="flask-192.png">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="default">
-	<meta name="apple-mobile-web-app-title" content="AppName">
+	<meta name="apple-mobile-web-app-title" content="Chemical Inventories">
     
 	<!-- Optional theme color -->
 	<meta name="theme-color" content="#333333">
@@ -43,7 +43,7 @@
     <!-- Login Section -->
 	<div id="login-section" class="login-container">
 		<h2>Login</h2>
-		<input type="text" id="username" placeholder="Name:" />
+		<input type="text" id="username" placeholder="Initials:" />
 		<button onclick="loginUser()">Login</button>
 	</div>
 
@@ -53,7 +53,7 @@
         	
 		<div class="actions-container">
         		<button onclick="searchChemicals()">🔍 Search Chemicals</button>
-        		<button onclick="inventoryAudit()">📦 Inventory Audit</button>
+        		<button onclick="audit-selection()">📦 Inventory Audit</button>
     		</div>
 
   
@@ -63,10 +63,10 @@
     			<h3>Upload Chemical Inventory Excel</h3>
     			<input type="file" id="excel-file" accept=".xlsx, .xls, .csv" onchange="handleFileUpload(event)" />
     			<div id="excel-preview" style="margin-top: 20px;"></div>
-			<button onclick="downloadModifiedFile()" style="margin-top: 20px;">
+			<button onclick="downloadModifiedFile()" style="margin-top: 30px;">
     				💾 Download File with Barcodes
 			</button>
-			<button onclick="generateLabels()" style="margin-top: 15px;">
+			<button onclick="generateLabels()" style="margin-top: 30px;">
     			🏷️ Generate Labels
 			</button>
 		</div>
@@ -75,8 +75,8 @@
 		<div id="audit-section" style="display: none; margin-top: 30px;">
     			<h3>Inventory Audit</h3>
     			<button onclick="scanAuditBarcode()">📷 Scan Chemical</button>
-    			<ul id="audit-results" style="margin-top: 20px;"></ul>
-			<button onclick="downloadAuditLog()" style="margin-top: 15px;">
+    			<ul id="audit-results" style="margin-top: 30px;"></ul>
+			<button onclick="downloadAuditLog()" style="margin-top: 30px;">
     				💾 Download Audit Log
 			</button>
 		</div>
@@ -86,15 +86,15 @@
 		  <!-- Search Button -->
 		<div class="search-chemicals" id="search-chemicals" style="display: none; margin-top: 30px;">
     			<h3>Search Chemicals</h3>
-			<button onclick="exitSearch()" style="margin-bottom: 10px;">🔙 Back to Menu</button>
+			<button onclick="exitSearch()" style="margin-bottom: 30px;">🔙 Back to Menu</button>
     			
-			<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+			<div style="display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 30px;">
   				<input
     					type="text"
     					id="search-input"
     					placeholder="Search by name or CAS"
     					oninput="performSearch()"
-    					style="flex: 1; min-width: 200px;"
+    					style="flex: 1; min-width: 100px;"
   				/>
   				<button type="button" onclick="clearSearch()">❌ Clear</button>
 			</div>
