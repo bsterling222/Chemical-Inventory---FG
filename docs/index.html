@@ -137,8 +137,13 @@
     	}
 	
 	function clearSearch() {
-  		document.getElementById('search-input').value = "";
-  		performSearch();
+  		const input = document.getElementById('search-input');
+  		const resultsList = document.getElementById('search-results');
+  		const searchSection = document.getElementById('search-chemicals');
+
+  		input.value = "";              // Clear input
+  		resultsList.innerHTML = "";   // Clear results
+  		searchSection.style.display = "none"; // Hide the entire search section
 	}
 
     	function displayExcelPreview(data) {
