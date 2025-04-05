@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width = device-width, initial-scale=1.0">
+	<meta name="viewport" content="width = device-width, initial-scale=0.75">
 	<title>Fritsch Group - Chemical Inventory System</title>
 
 	<!-- Link the Web App Manifest -->
@@ -71,8 +71,11 @@
 			</button>
 		</div>
 
+	</div>
+	</div>
+
    <!-- Inventory Audit -->
-		<div id="audit-section" style="display: none; margin-top: 30px;">
+		<div class="startAudit" id="audit-section" style="display: none; margin-top: 30px;">
     			<h3>Inventory Audit</h3>
     			<button onclick="scanAuditBarcode()">📷 Scan Chemical</button>
     			<ul id="audit-results" style="margin-top: 30px;"></ul>
