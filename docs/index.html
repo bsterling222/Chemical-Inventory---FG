@@ -75,7 +75,7 @@
    <!-- Inventory Audit -->
 		<div id="audit-section" style="display: none; margin-top: 30px;">
     			<h3>Inventory Audit</h3>
-			<button onclick="exitSearch()" style="margin-bottom: 30px;">🔙 Back to Menu</button>
+			<button onclick="InvexitSearch()" style="margin-bottom: 30px;">🔙 Back to Menu</button>
     			<button onclick="scanAuditBarcode()">📷 Scan Chemical</button>
     			<ul id="audit-results" style="margin-top: 30px;"></ul>
 			<button onclick="downloadAuditLog()" style="margin-top: 30px;">
@@ -659,7 +659,7 @@
   		document.getElementById('search-results').innerHTML = "";
 	}
 
-	function exitSearch() {
+	function InvexitSearch() {
   		// Hide search section
   		document.getElementById('startAudit').style.display = 'none';
 
