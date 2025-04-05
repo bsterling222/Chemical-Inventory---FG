@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width = device-width, initial-scale=1.0">
+	<title>Fritsch Group - Chemical Inventory System</title>
+
+	<!-- Link the Web App Manifest -->
+	<link rel="manifest" href="manifest.json">
+
+	<!-- Optional but recommended for iOS -->
+	<link rel="apple-touch-icon" href="flask-192.png">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="default">
+	<meta name="apple-mobile-web-app-title" content="AppName">
+    
+	<!-- Optional theme color -->
+	<meta name="theme-color" content="#333333">
+
+	<!-- Google Font: Roboto -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+	<!-- Barcode Scanner -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+
+	<!-- Upload Excel Reader -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+	<!-- Generate Labels -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
+</head>
+<body>
+
+	<!-- Page Title -->
+	<header class="page-title">
+		<h1>Fritsch Group Chemical Inventory</h1>
+	</header>
+
+    <!-- Login Section -->
+	<div class="login-container">
+		<h2>Login</h2>
+		<input type="text" id="username" placeholder="Name:" />
+		<button onclick="loginUser()">Login</button>
+	</div>
+
+    <!-- Home Page Section (Initially Hidden) -->
+	<div id="home-section" class="home-container" style="display: none;">
+        	<h2>Hello, <span id="display-name"></span>! What would you like to do?</h2>
+        	
+		<div class="actions-container">
+        		<button onclick="searchChemicals()">🔍 Search Chemicals</button>
+        		<button onclick="inventoryAudit()">📦 Inventory Audit</button>
+    		</div>
+
+    <!-- Search Button -->
+		<div class="search-chemicals" id="search-chemicals" style="display: none; margin-top: 30px;">
+    			<h3>Search Chemicals</h3>
+    			<input type="text" id="search-input" placeholder="Search by name or CAS" oninput="performSearch()" />
+			<button onclick="scanBarcode()">📷 Scan Barcode</button>
+			<button onclick="generateLabels()" style="margin-top: 15px;">
+    			🏷️ Generate Labels
+			</button>
+    			<ul id="search-results"></ul>
+		</div>
+
+   <!-- Upload Excel -->
+		<div style="margin-top: 40px;">
+    			<h3>Upload Chemical Inventory Excel</h3>
+    			<input type="file" id="excel-file" accept=".xlsx, .xls, .csv" onchange="handleFileUpload(event)" />
+    			<div id="excel-preview" style="margin-top: 20px;"></div>
+			<button onclick="downloadModifiedFile()" style="margin-top: 20px;">
+    				💾 Download File with Barcodes
+			</button>
+		</div>
+
+   <!-- Inventory Audit -->
+		<div id="audit-section" style="display: none; margin-top: 30px;">
+    			<h3>Inventory Audit</h3>
+    			<button onclick="scanAuditBarcode()">📷 Scan Chemical</button>
+    			<ul id="audit-results" style="margin-top: 20px;"></ul>
+			<button onclick="downloadAuditLog()" style="margin-top: 15px;">
+    				💾 Download Audit Log
+			</button>
+		</div>
+    	</div>
+
+    <!-- Scripts -->
+	<script>
+
+	
+
+	// Sample chemicalData (optional/fallback)
+    	let chemicalData = [
+        	// fallback data or empty if switching to Excel data only
+    	];
+
+    	// ✅ Excel Upload Handling
+    	let uploadedData = [];
+
+    	function handleFileUpload(event) {
+        	const file = event.target.files[0];
+        	if (!file) return;
+
+        	const reader = new FileReader();
+        	reader.onload = function(e) {
+            		const data = new Uint8Array(e.target.result);
+            		const workbook = XLSX.read(data, { type: 'array' });
+
+            		const sheetName = workbook.SheetNames[0];
+            		const sheet = workbook.Sheets[sheetName];
+            		const json = XLSX.utils.sheet_to_json(sheet);
+
+            		uploadedData = json;
+
+			workingData = uploadedData.map(item => ({
+    				...item,
+    				Barcode: item["Barcode"] || generateRandomBarcode()
+			}));
+
+            		displayExcelPreview(workingData);
+        	};
+        	reader.readAsArrayBuffer(file);
+    	}
+
+    	function displayExcelPreview(data) {
+    		const preview = document.getElementById('excel-preview');
+    		preview.innerHTML = "";
+
+    		if (data.length === 0) {
+        		preview.innerHTML = "<p>No data found.</p>";
+        		return;
+    		}
+
+    		const table = document.createElement('table');
+    		table.style.width = "100%";
+    		table.border = "1";
+
+    		const headers = Object.keys(data[0]);
+    		const thead = document.createElement('thead');
+    		const headRow = document.createElement('tr');
+
+    		// 🔹 Add the "Select" checkbox column
+    		const selectHeader = document.createElement('th');
+    		selectHeader.textContent = "Select";
+    		headRow.appendChild(selectHeader);
+
+    		// 🔹 Add rest of the headers
+    		headers.forEach(header => {
+        		const th = document.createElement('th');
+        		th.textContent = header;
+        		headRow.appendChild(th);
+    		});
+
+    		thead.appendChild(headRow);
+    		table.appendChild(thead);
+
+    		const tbody = document.createElement('tbody');
+    		data.forEach((row, index) => {
+        		const tr = document.createElement('tr');
+
+        		// 🔹 Create checkbox cell
+        		const checkboxCell = document.createElement('td');
+        		const checkbox = document.createElement('input');
+        		checkbox.type = 'checkbox';
+        		checkbox.className = 'label-checkbox';
+        		checkbox.dataset.index = index;
+        		checkboxCell.appendChild(checkbox);
+        		tr.appendChild(checkboxCell);
+
+        		// 🔹 Add data cells
+        		headers.forEach(header => {
+            			const td = document.createElement('td');
+            			td.textContent = row[header] || "";
+            			tr.appendChild(td);
+        		});
+
+        		tbody.appendChild(tr);
+    		});
+
+		const buttonContainer = document.createElement('div');
+		buttonContainer.style.margin = "10px 0";
+
+		const selectAllBtn = document.createElement('button');
+		selectAllBtn.textContent = "✅ Select All";
+		selectAllBtn.onclick = () => selectAllLabels(true);
+
+		const deselectAllBtn = document.createElement('button');
+		deselectAllBtn.textContent = "❌ Deselect All";
+		deselectAllBtn.onclick = () => selectAllLabels(false);
+
+		buttonContainer.appendChild(selectAllBtn);
+		buttonContainer.appendChild(deselectAllBtn);
+
+    		table.appendChild(tbody);
+    		preview.appendChild(table);
+
+	}
+
+	
+	function generateRandomBarcode() {
+    		return Math.floor(1000000000 + Math.random() * 9000000000).toString();
+	}
+
+	function downloadModifiedFile() {
+    		if (workingData.length === 0) {
+        		alert("No data available to download.");
+        		return;
+    		}
+
+    		const ws = XLSX.utils.json_to_sheet(workingData);
+    		const wb = XLSX.utils.book_new();
+    		XLSX.utils.book_append_sheet(wb, ws, "Inventory with Barcodes");
+
+    		const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+
+    		const blob = new Blob([wbout], { type: "application/octet-stream" });
+    		const url = URL.createObjectURL(blob);
+
+    		const a = document.createElement("a");
+    		a.href = url;
+    		const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+		a.download = `Chemical_Inventory_With_Barcodes_${today}.xlsx`;
+    		document.body.appendChild(a);
+    		a.click();
+    		document.body.removeChild(a);
+    		URL.revokeObjectURL(url);
+	}
+
+	function selectAllLabels(shouldSelect) {
+    		const checkboxes = document.querySelectorAll('.label-checkbox');
+    		checkboxes.forEach(cb => cb.checked = shouldSelect);
+	}
+
+	let currentUsername = ""; // global variable
+
+	function loginUser() {
+		
+		const username = document.getElementById('username').value.trim();
+		
+		if(username === "") {
+			alert("Please enter your name.");
+			return;
+		}
+
+		currentUsername = username;
+
+		// Log the username and timestamp to localStorage
+		const logins = JSON.parse(localStorage.getItem('logins') || '[]');
+		logins.push({
+			name: username,
+			time: new Date().toLocaleString()
+		});
+
+		localStorage.setItem('logins', JSON.stringify(logins));
+
+		 // Hide login section
+           	 document.getElementById('login-section').style.display = 'none';
+
+            	// Show home section
+            	document.getElementById('home-section').style.display = 'block';
+
+            	// Personalize the greeting
+            	document.getElementById('display-name').textContent = username;
+	}	
+
+
+	function searchChemicals() {
+    	// Show the search section
+    		document.getElementById('search-chemicals').style.display = 'block';
+	}
+
+	function performSearch() {
+    		const input = document.getElementById('search-input').value.toLowerCase();
+    		const resultsList = document.getElementById('search-results');
+   		 resultsList.innerHTML = '';
+
+    		if (workingData.length === 0) {
+        		resultsList.innerHTML = '<li>No data loaded.</li>';
+        		return;
+    		}
+
+    		const filtered = input === ""
+       	 		? workingData
+        		: workingData.filter(item =>
+            			(item["Chemical Name"] || "").toLowerCase().includes(input) ||
+            			(item["CAS Number"] || "").includes(input)
+        		);
+
+    		if (filtered.length === 0) {
+        		resultsList.innerHTML = '<li>No results found.</li>';
+        		return;
+    		}
+
+    		filtered.forEach(item => {
+        		const li = document.createElement('li');
+        		li.innerHTML = `
+            			<strong>${item["Chemical Name"]}</strong><br>
+            			CAS: ${item["CAS Number"]}<br>
+            			Amount: ${item["Amount"] || ""} ${item["Units"] || ""}<br>
+            			Quantity: ${item["Quantity"] || ""}<br>
+            			Manufacturer: ${item["Manufacturer"] || ""}<br>
+            			Barcode: ${item["Barcode"]}
+        		`;
+        		resultsList.appendChild(li);
+    		});
+	}
+
+	function scanBarcode() {
+    
+		// Create a scanning overlay
+    		const scannerOverlay = document.createElement('div');
+    		scannerOverlay.id = 'scanner-overlay';
+    		scannerOverlay.style.position = 'fixed';
+    		scannerOverlay.style.top = '0';
+    		scannerOverlay.style.left = '0';
+    		scannerOverlay.style.width = '100vw';
+    		scannerOverlay.style.height = '100vh';
+    		scannerOverlay.style.backgroundColor = 'rgba(0,0,0,0.8)';
+    		scannerOverlay.style.zIndex = '9999';
+    		scannerOverlay.innerHTML = `
+        		<div style="position: relative; width: 100%; height: 100%;">
+         			<button onclick="stopScanner()" style="position: absolute; top: 10px; right: 10px; z-index: 10000;">✖ Close</button>
+            			<div id="scanner" style="width: 100%; height: 100%;"></div>
+        		</div>
+    		`;
+    		document.body.appendChild(scannerOverlay);
+
+    		Quagga.init({
+        		inputStream: {
+            			type: "LiveStream",
+            			target: document.querySelector('#scanner'),
+            			constraints: {
+                			facingMode: "environment" // Use back camera
+            			},
+        		},
+        		decoder: {
+           			readers: ["code_128_reader", "ean_reader", "ean_8_reader", "upc_reader"]
+        		}
+    		}, function(err) {
+        		if (err) {
+            			alert("Failed to start scanner: " + err);
+            			stopScanner();
+            			return;
+        		}
+        		Quagga.start();
+    		});
+
+    		Quagga.onDetected(function(result) {
+        		const code = result.codeResult.code;
+        		Quagga.stop();
+        		stopScanner();
+
+        		const resultsList = document.getElementById('search-results');
+        		resultsList.innerHTML = '';
+
+			if (uploadedData.length === 0) {
+        			resultsList.innerHTML = `<li>No Excel data loaded.</li>`;
+        			return;
+    			}
+
+    			const match = uploadedData.find(item => (item["Barcode"] || "").toString() === code);
+
+        		if (match) {
+            			const li = document.createElement('li');
+            			li.innerHTML = `
+    					<strong>${match["Chemical Name"]}</strong><br>
+    					CAS: ${match["CAS Number"]}<br>
+    					Amount: ${match["Amount"] || ""} ${match["Units"] || ""}<br>
+    					Quantity: ${match["Quantity"] || ""}<br>
+    					Manufacturer: ${match["Manufacturer"] || ""}<br>
+    					Barcode: ${code}
+				`;
+				resultsList.appendChild(li);
+        		}
+    		});
+	}
+
+	function stopScanner() {
+    		Quagga.stop();
+    		const overlay = document.getElementById('scanner-overlay');
+    		if (overlay) overlay.remove();
+	}
+
+
+	let auditStatus = {}; // Tracks which barcodes have been scanned
+
+	function startAudit() {
+    		document.getElementById('audit-section').style.display = 'block';
+    		document.getElementById('search-chemicals').style.display = 'none'; // optional: hide search
+    		updateAuditList();
+	}
+
+	function scanAuditBarcode() {
+    		const scannerOverlay = document.createElement('div');
+    		scannerOverlay.id = 'scanner-overlay';
+    		scannerOverlay.style = `
+        		position: fixed; top: 0; left: 0;
+       			width: 100vw; height: 100vh;
+        		background-color: rgba(0,0,0,0.8);
+        		z-index: 9999;
+    		`;
+    		scannerOverlay.innerHTML = `
+        		<div style="position: relative; width: 100%; height: 100%;">
+            			<button onclick="stopScanner()" style="position: absolute; top: 10px; right: 10px; z-index: 10000;">✖ Close</button>
+            			<div id="scanner" style="width: 100%; height: 100%;"></div>
+        		</div>
+    		`;
+    		document.body.appendChild(scannerOverlay);
+
+    		Quagga.init({
+        		inputStream: {
+            			type: "LiveStream",
+            			target: document.querySelector('#scanner'),
+            			constraints: { facingMode: "environment" }
+        		},
+        		decoder: {
+            			readers: ["code_128_reader", "ean_reader", "ean_8_reader", "upc_reader"]
+        		}
+    		}, function(err) {
+        		if (err) {
+            			alert("Failed to start scanner: " + err);
+            			stopScanner();
+            			return;
+        		}
+        		Quagga.start();
+    		});
+
+    		Quagga.onDetected(function(result) {
+        		const code = result.codeResult.code;
+        		Quagga.stop();
+        		stopScanner();
+
+        		const match = workingData.find(item => (item["Barcode"] || "").toString() === code);
+
+        		if (match) {
+            			auditStatus[barcode] = {
+    					user: currentUsername,
+    					time: new Date().toLocaleString()
+				};
+            			updateAuditList();
+        		} else {
+            			alert("Scanned barcode not found in inventory.");
+        		}
+    		});
+	}
+
+	function updateAuditList() {
+    		const auditList = document.getElementById('audit-results');
+    		auditList.innerHTML = "";
+
+    		workingData.forEach(item => {
+        		const code = (item["Barcode"] || "").toString();
+        		const li = document.createElement('li');
+        		li.style.padding = "8px";
+        		li.style.marginBottom = "5px";
+        		li.style.borderRadius = "5px";
+
+        		const auditEntry = auditStatus[code];
+			const isScanned = !!auditEntry;
+        		li.style.backgroundColor = isScanned ? "#d4edda" : "#f8d7da"; // green or red
+
+        		li.innerHTML = `
+    				<strong>${item["Chemical Name"]}</strong><br>
+    				CAS: ${item["CAS Number"]}<br>
+    				Barcode: ${code}<br>
+    				Status: ${isScanned ? "✅ Present" : "❌ Not Found"}<br>
+    				${isScanned ? `Audited by: ${auditEntry.user} at ${auditEntry.time}` : ""}
+			`;
+        		auditList.appendChild(li);
+    		});
+	}
+
+	function downloadAuditLog() {
+    		if (workingData.length === 0) {
+        		alert("No inventory data to export.");
+        		return;
+    		}
+
+    		// Build rows using the original structure + audit info
+    		const logData = workingData.map(item => {
+        	const barcode = (item["Barcode"] || "").toString();
+        	const auditEntry = auditStatus[barcode];
+
+        	return {
+            		"Chemical Name": item["Chemical Name"] || "",
+            		"CAS Number": item["CAS Number"] || "",
+            		"Amount": item["Amount"] || "",
+            		"Units": item["Units"] || "",
+            		"Quantity": item["Quantity"] || "",
+            		"Manufacturer": item["Manufacturer"] || "",
+           		"Barcode": barcode,
+            		"Status": auditEntry ? "✅ Present" : "❌ Not Found",
+            		"Audited By": auditEntry?.user || "",
+            		"Audit Time": auditEntry?.time || ""
+        	};
+    	});
+
+    	const ws = XLSX.utils.json_to_sheet(logData);
+    	const wb = XLSX.utils.book_new();
+    	XLSX.utils.book_append_sheet(wb, ws, "Audit Log");
+
+    	const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+
+    	const blob = new Blob([wbout], { type: "application/octet-stream" });
+    	const url = URL.createObjectURL(blob);
+
+    	const a = document.createElement("a");
+    	const today = new Date().toISOString().slice(0, 10);
+    	a.download = `Chemical_Audit_Log_${today}.xlsx`;
+    	a.href = url;
+
+    	document.body.appendChild(a);
+    	a.click();
+    	document.body.removeChild(a);
+    	URL.revokeObjectURL(url);
+	}
+
+	function centerText(doc, text, labelX, labelWidth, y) {
+    		const textWidth = doc.getTextWidth(text);
+    		const centerX = labelX + (labelWidth / 2) - (textWidth / 2);
+    		doc.text(text, centerX, y);
+	}
+	async function generateLabels() {
+    		// 🔹 Get all selected checkboxes
+    		const selectedIndexes = Array.from(document.querySelectorAll('.label-checkbox'))
+        		.filter(cb => cb.checked)
+        		.map(cb => parseInt(cb.dataset.index));
+
+    		// 🔹 Build a filtered list of selected chemicals
+    		const labelData = selectedIndexes.map(i => workingData[i]);
+
+    		if (labelData.length === 0) {
+        		alert("Please select at least one chemical to generate labels.");
+        		return;
+    		}
+
+    		// 🔹 Continue the rest of the label generation using labelData
+    		const { jsPDF } = window.jspdf;
+    		const doc = new jsPDF();
+
+    		const labelsPerRow = 3;
+    		const labelsPerColumn = 10;
+    		const labelWidth = 66.675;
+    		const labelHeight = 25.4;
+    		const marginX = 4.7625;
+    		const marginY = 12.7;
+    		const spacingX = 3.175;
+    		const spacingY = 0;
+
+    		for (let i = 0; i < labelData.length; i++) {
+        		const item = labelData[i];
+
+        		const row = Math.floor((i % (labelsPerRow * labelsPerColumn)) / labelsPerRow);
+        		const col = i % labelsPerRow;
+
+        		const x = marginX + col * (labelWidth + spacingX);
+        		const y = marginY + row * (labelHeight + spacingY);
+
+        		const barcodeSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        		JsBarcode(barcodeSvg, item["Barcode"], {
+           			format: "CODE128",
+            			displayValue: false,
+            			height: 20,
+            			width: 1.5,
+            			margin: 0
+        		});
+
+        		const barcodeCanvas = document.createElement("canvas");
+        		const svgData = new XMLSerializer().serializeToString(barcodeSvg);
+        		const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+        		const url = URL.createObjectURL(svgBlob);
+
+        		const img = new Image();
+        		await new Promise(resolve => {
+            			img.onload = function () {
+                			const ctx = barcodeCanvas.getContext("2d");
+               				barcodeCanvas.width = img.width;
+                			barcodeCanvas.height = img.height;
+                			ctx.drawImage(img, 0, 0);
+                			URL.revokeObjectURL(url);
+                			resolve();
+            			};
+            			img.src = url;
+        		});
+
+        		const barcodeDataUrl = barcodeCanvas.toDataURL("image/png");
+
+        		// Centered label layout
+        		doc.setFontSize(10);
+        		doc.setFont(undefined, 'bold');
+        		centerText(doc, item["Chemical Name"], x, labelWidth, y + 6);
+
+        		doc.setFont(undefined, 'normal');
+        		const cas = item["CAS Number"] || "N/A";
+        		const mfr = item["Manufacturer"] || "N/A";
+        		const amount = item["Amount"] || "";
+        		const units = item["Units"] || "";
+        		const infoLine = `CAS: ${cas} | MFR: ${mfr} | ${amount} ${units}`;
+        		centerText(doc, infoLine, x, labelWidth, y + 10);
+
+        		doc.addImage(barcodeDataUrl, "PNG", x + (labelWidth - 50) / 2, y + 13, 50, 10);
+
+        		doc.setFontSize(9);
+        		centerText(doc, item["Barcode"], x, labelWidth, y + 24);
+
+        		if ((i + 1) % 30 === 0 && i + 1 < labelData.length) {
+           			doc.addPage();
+        		}
+    		}
+
+    		const today = new Date().toISOString().slice(0, 10);
+    		doc.save(`Chemical_Labels_${today}.pdf`);
+	}
+
+
+	if ('serviceWorker' in navigator) {
+ 		navigator.serviceWorker.register('service-worker.js').then(() => {
+    			console.log("✅ Service Worker Registered");
+  		});
+	}
+	</script>
+
+<!-- Hidden SVG container used for generating barcodes -->
+<div style="display: none;">
+    <svg id="barcode-preview"></svg>
+</div>
+
+</body>
+</html>
