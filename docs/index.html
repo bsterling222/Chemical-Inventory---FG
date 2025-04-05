@@ -66,6 +66,9 @@
 			<button onclick="downloadModifiedFile()" style="margin-top: 20px;">
     				💾 Download File with Barcodes
 			</button>
+			<button onclick="generateLabels()" style="margin-top: 15px;">
+    			🏷️ Generate Labels
+			</button>
 		</div>
 
    <!-- Inventory Audit -->
@@ -96,9 +99,7 @@
   				<button type="button" onclick="clearSearch()">❌ Clear</button>
 			</div>
 			<button onclick="scanBarcode()">📷 Scan Barcode</button>
-			<button onclick="generateLabels()" style="margin-top: 15px;">
-    			🏷️ Generate Labels
-			</button>
+			
     			<ul id="search-results"></ul>
 		</div>
 	</div>
@@ -144,12 +145,7 @@
 	
 	function clearSearch() {
   		const input = document.getElementById('search-input');
-  		const resultsList = document.getElementById('search-results');
-  		const searchSection = document.getElementById('search-chemicals');
-
-  		input.value = "";              // Clear input
-  		resultsList.innerHTML = "";   // Clear results
-  		searchSection.style.display = "none"; // Hide the entire search section
+  		input.value = "";           // Clear input field
 	}
 
     	function displayExcelPreview(data) {
