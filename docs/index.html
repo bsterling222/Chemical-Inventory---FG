@@ -59,6 +59,7 @@
     <!-- Search Button -->
 		<div class="search-chemicals" id="search-chemicals" style="display: none; margin-top: 30px;">
     			<h3>Search Chemicals</h3>
+			<button onclick="exitSearch()" style="margin-bottom: 10px;">🔙 Back to Menu</button>
     			<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
   				<input
     					type="text"
@@ -290,8 +291,10 @@
 
 
 	function searchChemicals() {
-    	// Show the search section
-    		document.getElementById('search-chemicals').style.display = 'block';
+  		document.getElementById('search-chemicals').style.display = 'block';
+  		document.getElementById('home-section').style.display = 'none'; // Hide home while searching
+  		document.getElementById('search-input').value = "";
+  		document.getElementById('search-results').innerHTML = "";
 	}
 
 	function performSearch() {
@@ -642,6 +645,18 @@
  		navigator.serviceWorker.register('service-worker.js').then(() => {
     			console.log("✅ Service Worker Registered");
   		});
+	}
+	
+	function exitSearch() {
+  		// Hide search section
+  		document.getElementById('search-chemicals').style.display = 'none';
+
+  		// Show home section again
+  		document.getElementById('home-section').style.display = 'block';
+
+  		// Clear search bar and results
+  		document.getElementById('search-input').value = "";
+  		document.getElementById('search-results').innerHTML = "";
 	}
 	</script>
 
