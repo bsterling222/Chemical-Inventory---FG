@@ -41,6 +41,26 @@ body {
     max-width: 500px;
     text-align: center;
 }
+.actions-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.actions-container button {
+    padding: 12px 20px;
+    background-color: #333333;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.actions-container button:hover {
+    background-color: #555555;
+}
 
 input[type="text"] {
     width: 90%;
