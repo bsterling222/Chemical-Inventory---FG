@@ -53,10 +53,8 @@
         	
 		<div class="actions-container">
         		<button onclick="searchChemicals()">🔍 Search Chemicals</button>
-        		<button onclick="audit-section()">📦 Inventory Audit</button>
+        		<button onclick="startAudit()">📦 Inventory Audit</button>
     		</div>
-
-  
 
    <!-- Upload Excel -->
 		<div style="margin-top: 40px;">
@@ -652,6 +650,18 @@
 	function exitSearch() {
   		// Hide search section
   		document.getElementById('search-chemicals').style.display = 'none';
+
+  		// Show home section again
+  		document.getElementById('home-section').style.display = 'block';
+
+  		// Clear search bar and results
+  		document.getElementById('search-input').value = "";
+  		document.getElementById('search-results').innerHTML = "";
+	}
+
+	function exitSearch() {
+  		// Hide search section
+  		document.getElementById('startAudit').style.display = 'none';
 
   		// Show home section again
   		document.getElementById('home-section').style.display = 'block';
