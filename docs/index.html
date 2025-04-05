@@ -53,7 +53,7 @@
         	
 		<div class="actions-container">
         		<button onclick="searchChemicals()">🔍 Search Chemicals</button>
-        		<button onclick="audit-section()">📦 Inventory Audit</button>
+        		<button onclick="startAudit()">📦 Inventory Audit</button>
     		</div>
 
   
@@ -77,6 +77,7 @@
    <!-- Inventory Audit -->
 		<div class="startAudit" id="audit-section" style="display: none; margin-top: 30px;">
     			<h3>Inventory Audit</h3>
+			<button onclick="exitSearch()" style="margin-bottom: 30px;">🔙 Back to Menu</button>
     			<button onclick="scanAuditBarcode()">📷 Scan Chemical</button>
     			<ul id="audit-results" style="margin-top: 30px;"></ul>
 			<button onclick="downloadAuditLog()" style="margin-top: 30px;">
