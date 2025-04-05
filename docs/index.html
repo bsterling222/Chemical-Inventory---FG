@@ -59,7 +59,10 @@
     <!-- Search Button -->
 		<div class="search-chemicals" id="search-chemicals" style="display: none; margin-top: 30px;">
     			<h3>Search Chemicals</h3>
-    			<input type="text" id="search-input" placeholder="Search by name or CAS" oninput="performSearch()" />
+    			<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+  				<input type="text" id="search-input" placeholder="Search by name or CAS" oninput="performSearch()" />
+  				<button onclick="clearSearch()">❌ Clear</button>
+			</div>
 			<button onclick="scanBarcode()">📷 Scan Barcode</button>
 			<button onclick="generateLabels()" style="margin-top: 15px;">
     			🏷️ Generate Labels
@@ -126,6 +129,12 @@
         	};
         	reader.readAsArrayBuffer(file);
     	}
+	
+	function clearSearch() {
+    		const input = document.getElementById('search-input');
+    		input.value = "";
+    		performSearch(); // Re-run to show all results
+	}
 
     	function displayExcelPreview(data) {
     		const preview = document.getElementById('excel-preview');
