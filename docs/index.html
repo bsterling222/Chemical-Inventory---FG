@@ -615,7 +615,7 @@
         		doc.setFont(undefined, 'normal');
         		const cas = item["CAS Number"] || "N/A";
         		const mfr = item["Manufacturer"] || "N/A";
-        		const infoLine = `CAS: ${cas} | ${mfr}';
+        		const infoLine = `CAS: ${cas} | ${mfr}`;
         		centerText(doc, infoLine, x, labelWidth, y + 10);
 
         		doc.addImage(barcodeDataUrl, "PNG", x + (labelWidth - 50) / 2, y + 13, 50, 10);
