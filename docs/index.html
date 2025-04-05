@@ -59,9 +59,15 @@
     <!-- Search Button -->
 		<div class="search-chemicals" id="search-chemicals" style="display: none; margin-top: 30px;">
     			<h3>Search Chemicals</h3>
-    			<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-  				<input type="text" id="search-input" placeholder="Search by name or CAS" oninput="performSearch()" />
-  				<button onclick="clearSearch()">❌ Clear</button>
+    			<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+  				<input
+    					type="text"
+    					id="search-input"
+    					placeholder="Search by name or CAS"
+    					oninput="performSearch()"
+    					style="flex: 1; min-width: 200px;"
+  				/>
+  				<button type="button" onclick="clearSearch()">❌ Clear</button>
 			</div>
 			<button onclick="scanBarcode()">📷 Scan Barcode</button>
 			<button onclick="generateLabels()" style="margin-top: 15px;">
@@ -131,9 +137,8 @@
     	}
 	
 	function clearSearch() {
-    		const input = document.getElementById('search-input');
-    		input.value = "";
-    		performSearch(); // Re-run to show all results
+  		document.getElementById('search-input').value = "";
+  		performSearch();
 	}
 
     	function displayExcelPreview(data) {
