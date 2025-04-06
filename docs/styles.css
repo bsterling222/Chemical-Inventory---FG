@@ -5,7 +5,7 @@ body {
 	display: flex;
 	justify-content: center;
 	align-items: flex-start;
-	padding-top: 30px;
+	padding-top: 100px; /* More padding to move login down from header */
 	margin: 0;
 }
 
@@ -27,7 +27,30 @@ body {
 	color: #1a1a1a; /* Darker title color for contrast */
 }
 
-.login-container,
+.login-container {
+	background-color: #ffffff;
+	padding: 30px 20px;
+	border-radius: 10px;
+	box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+	width: 90%;
+	max-width: 360px;
+	margin: 0 auto;
+	text-align: center;
+	position: relative;
+}
+
+.login-container h2 {
+	margin-bottom: 20px;
+	font-size: 22px;
+	color: #2a2a2a;
+}
+
+.login-container input[type="text"] {
+	width: 100%;
+	max-width: 280px;
+	margin: 0 auto 15px;
+}
+
 .home-container,
 .search-chemicals,
 #audit-section {
