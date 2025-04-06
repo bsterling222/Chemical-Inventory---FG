@@ -553,21 +553,32 @@
 		doc.text(text, startX, y);
 	}
 
-	function wrapText(doc, text, maxWidth, maxCharsPerLine = 30) {
+	function wrapText(doc, text, maxWidth) {
 		const words = text.split(" ");
-		let lines = [];
-		let currentLine = words[0];
+		const lines = [];
+		let currentLine = "";
 
-		for (let i = 1; i < words.length; i++) {
-			const testLine = currentLine + " " + words[i];
-			if (doc.getTextWidth(testLine) < maxWidth && testLine.length <= maxCharsPerLine){
-				currentLine = testLine;
+		for (let i = 0; i < words.length; i++) {
+			let word = words[i];
+			let testLine = currentLine ? currentLine + " " + word : word;
+
+			if (doc.getTextWidth(testLine) < maxWidth) {
+			currentLine = testLine;
 			} else {
-				lines.push(currentLine);
-				currentLine = words[i];
+				if (currentLine) lines.push(currentLine);
+				// If word is too long by itself, break it up
+				while (doc.getTextWidth(word) > maxWidth) {
+					let cutoff = word.length;
+					while (cutoff > 0 && doc.getTextWidth(word.slice(0, cutoff)) > maxWidth) {
+						cutoff--;
+					}
+					lines.push(word.slice(0, cutoff));
+					word = word.slice(cutoff);
+				}
+				currentLine = word;
 			}
 		}
-		lines.push(currentLine);
+		if (currentLine) lines.push(currentLine);
 		return lines;
 	}
 
@@ -601,7 +612,7 @@
     		for (let i = 0; i < labelData.length; i++) {
         		const item = labelData[i];
 
-        		const row = Math.floor((i % (labelsPerRow * labelsPerColumn)) / labelsPerRow);
+        		const row = Math.floor((i % 30) / labelsPerRow); // 30 labels per page
         		const col = i % labelsPerRow;
 
         		const x = marginX + col * (labelWidth + spacingX);
