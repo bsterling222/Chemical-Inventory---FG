@@ -460,14 +460,18 @@
 			Quagga.start();
 		});
 
-		Quagga.onDetected(function (result) {
+		let lastScannedCode = null;
+		let lastScannedTime = 0;
+
+		Quagga.onDetected(function(result) {
 			const code = result.codeResult.code;
 
-			// Ignore duplicate scans within 3 seconds
-			if (recentlyScanned.has(code)) return;
-
-			recentlyScanned.add(code);
-			setTimeout(() => recentlyScanned.delete(code), 3000); // allow scanning same code again later
+			const now = Date.now();
+			if (code === lastScannedCode && now - lastScannedTime < 3000) {
+				return; // Debounce: avoid re-scanning same code within 3s
+			}
+			lastScannedCode = code;
+			lastScannedTime = now;
 
 			const match = workingData.find(item => (item["Barcode"] || "").toString() === code);
 
@@ -477,11 +481,27 @@
 					time: new Date().toLocaleString()
 				};
 				updateAuditList();
-			} else {
-				alert("Scanned barcode not found in inventory.");
+			} else if (!recentlyScanned.has(code)) {
+				recentlyScanned.add(code);
+				console.warn("Scanned barcode not found in inventory:", code);
+
+				// Optional: show a toast-style error message instead of alert()
+				const msg = document.createElement('div');
+				msg.textContent = `❌ Not found: ${code}`;
+				msg.style.position = "fixed";
+				msg.style.bottom = "20px";
+				msg.style.left = "50%";
+				msg.style.transform = "translateX(-50%)";
+				msg.style.background = "#f44336";
+				msg.style.color = "#fff";
+				msg.style.padding = "10px 20px";
+				msg.style.borderRadius = "5px";
+				msg.style.zIndex = "10000";
+				document.body.appendChild(msg);
+				setTimeout(() => msg.remove(), 3000);
 			}
+		
 		});
-	}
 
 	function updateAuditList() {
     		const auditList = document.getElementById('audit-results');
