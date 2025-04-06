@@ -538,178 +538,106 @@
     	URL.revokeObjectURL(url);
 	}
 
-	function fitAndCenterText(doc, text, x, width, y, defaultSize = 10, minSize = 6, fontStyle = 'bold') {
-		doc.setFont(undefined, fontStyle);
-		doc.setFontSize(defaultSize);
-		let textWidth = doc.getTextWidth(text);
-
-		// Reduce font size until it fits or we hit minSize
-		while (textWidth > width && doc.getFontSize() > minSize) {
-			doc.setFontSize(doc.getFontSize() - 0.5);  // finer adjustment
-			textWidth = doc.getTextWidth(text);
-		}
-
-		const startX = x + (width - textWidth) / 2;
-		doc.text(text, startX, y);
-	}
-
-	function wrapText(doc, text, maxWidth, maxCharsPerLine = 22) {
-		const words = text.split(" ");
-		const lines = [];
-		let currentLine = "";
-
-		for (let i = 0; i < words.length; i++) {
-			let word = words[i];
-			let testLine = currentLine ? currentLine + " " + word : word;
-
-			if (doc.getTextWidth(testLine) < maxWidth && testLine.length <= maxCharsPerLine) {
-			currentLine = testLine;
-			} else {
-				if (currentLine) lines.push(currentLine);
-				// If word is too long by itself, break it up
-				while (doc.getTextWidth(word) > maxWidth || word.length > maxCharsPerLine) {
-					let cutoff = Math.min(word.length, maxCharsPerLine);
-					while (cutoff > 0 && (doc.getTextWidth(word.slice(0, cutoff)) > maxWidth || cutoff > maxCharsPerLine)) {
-						cutoff--;
-					}
-					lines.push(word.slice(0, cutoff));
-					word = word.slice(cutoff);
-				}
-				currentLine = word;
-			}
-		}
-		if (currentLine) lines.push(currentLine);
-		return lines;
-	}
-
 	async function generateLabels() {
-    		const selectedIndexes = Array.from(document.querySelectorAll('.label-checkbox'))
-        		.filter(cb => cb.checked)
-        		.map(cb => parseInt(cb.dataset.index));
+		const selectedIndexes = Array.from(document.querySelectorAll('.label-checkbox'))
+			.filter(cb => cb.checked)
+			.map(cb => parseInt(cb.dataset.index));
 
-    		const labelData = selectedIndexes.map(i => workingData[i]);
+		const labelData = selectedIndexes.map(i => workingData[i]);
 
-    		if (labelData.length === 0) {
-        		alert("Please select at least one chemical to generate labels.");
-        		return;
-    		}
+		if (labelData.length === 0) {
+			alert("Please select at least one chemical to generate labels.");
+			return;
+		}
 
-    		const { jsPDF } = window.jspdf;
-    		const doc = new jsPDF({
-        		unit: "mm",
-        		format: "letter"
-    		});
+		const { jsPDF } = window.jspdf;
+		const doc = new jsPDF({
+			unit: "mm",
+			format: "letter"
+		});
 
-    		const labelsPerRow = 3;
-    		const labelsPerColumn = 10;
-    		const labelWidth = 66.675;
-    		const labelHeight = 25.4;
-    		const marginX = 3.8;
-    		const marginY = 12.3;
-    		const spacingX = 4.175;
-    		const spacingY = 0.2;
+		const labelsPerRow = 3;
+		const labelsPerColumn = 10;
+		const labelWidth = 66.675;
+		const labelHeight = 25.4;
+		const marginX = 3.8;
+		const marginY = 12.3;
+		const spacingX = 4.175;
+		const spacingY = 0.2;
 
-    		for (let i = 0; i < labelData.length; i++) {
-        		const item = labelData[i];
+		for (let i = 0; i < labelData.length; i++) {
+			const item = labelData[i];
 
-        		const row = Math.floor((i % 30) / labelsPerRow); // 30 labels per page
-        		const col = i % labelsPerRow;
+			const row = Math.floor((i % 30) / labelsPerRow); // 30 labels per page
+			const col = i % labelsPerRow;
 
-        		const x = marginX + col * (labelWidth + spacingX);
-        		const y = marginY + row * (labelHeight + spacingY);
+			const x = marginX + col * (labelWidth + spacingX);
+			const y = marginY + row * (labelHeight + spacingY);
 
-        		const barcodeSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        		JsBarcode(barcodeSvg, item["Barcode"], {
-            			format: "CODE128",
-            			displayValue: false,
-            			height: 10,
-            			width: 1.5,
-            			margin: 0
-        		});
-
-        		const barcodeCanvas = document.createElement("canvas");
-        		const svgData = new XMLSerializer().serializeToString(barcodeSvg);
-        		const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
-        		const url = URL.createObjectURL(svgBlob);
-
-        		const img = new Image();
-        		await new Promise(resolve => {
-            			img.onload = function () {
-                			const ctx = barcodeCanvas.getContext("2d");
-                			barcodeCanvas.width = img.width;
-                			barcodeCanvas.height = img.height;
-                			ctx.drawImage(img, 0, 0);
-                			URL.revokeObjectURL(url);
-                			resolve();
-            			};
-            			img.src = url;
-        		});
-
-        		const barcodeDataUrl = barcodeCanvas.toDataURL("image/png");
-
-       			 // Layout configuration
-			const nameTop = y + 4;
-        		const nameLineHeight = 4;
-        		const infoSpacing = 1.5;
-        		const barcodeSpacing = 2;
-        		const maxNameLines = 2;
-
-        		// Chemical Name
-        		// Auto-shrinking chemical name to fit within 2 lines
-			let fontSize = 9;
-			doc.setFont(undefined, "bold");
-			doc.setFontSize(fontSize);
-
-			let nameLines = wrapText(doc, item["Chemical Name"], labelWidth);
-			while (nameLines.length > 2 && fontSize > 6) {
-				fontSize -= 0.5;
-				doc.setFontSize(fontSize);
-				nameLines = wrapText(doc, item["Chemical Name"], labelWidth);
-			}
-
-			nameLines = nameLines.slice(0, 2); // always cap to 2 lines max
-
-			nameLines.forEach((line, idx) => {
-				const yOffset = nameTop + idx * nameLineHeight;
-				const xOffset = x + (labelWidth - doc.getTextWidth(line)) / 2;
-				doc.text(line, xOffset, yOffset);
+			const barcodeSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+			JsBarcode(barcodeSvg, item["Barcode"], {
+				format: "CODE128",
+				displayValue: false,
+				height: 10,
+				width: 1.5,
+				margin: 0
 			});
 
-        		// CAS Info
-        		const cas = item["CAS Number"] || "N/A";
-        		const mfr = item["Manufacturer"] || "N/A";
-        		const infoLine = `CAS: ${cas} | ${mfr}`;
-        		const infoYOffset = nameTop + nameLines.length * nameLineHeight + infoSpacing;
-        		fitAndCenterText(doc, infoLine, x, labelWidth, infoYOffset, 7, 5, 'normal');
+			const barcodeCanvas = document.createElement("canvas");
+			const svgData = new XMLSerializer().serializeToString(barcodeSvg);
+			const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+			const url = URL.createObjectURL(svgBlob);
 
-        		// Barcode
-        		const barcodeYOffset = infoYOffset + barcodeSpacing;
-        		const barcodeWidth = 40;
-        		const barcodeHeight = 10;
-        		const maxBarcodeYOffset = y + labelHeight - barcodeHeight - 1;
-        		const finalBarcodeYOffset = Math.min(barcodeYOffset, maxBarcodeYOffset);
-        		doc.addImage(
-            			barcodeDataUrl,
-            			"PNG",
-            			x + (labelWidth - barcodeWidth) / 2,
-           			finalBarcodeYOffset,
-            			barcodeWidth,
-            			barcodeHeight
-        		);
+			const img = new Image();
+			await new Promise(resolve => {
+				img.onload = function () {
+					const ctx = barcodeCanvas.getContext("2d");
+					barcodeCanvas.width = img.width;
+					barcodeCanvas.height = img.height;
+					ctx.drawImage(img, 0, 0);
+					URL.revokeObjectURL(url);
+					resolve();
+				};
+				img.src = url;
+			});
 
-        		// Optional: Draw label boundary for testing
-        		// doc.setDrawColor(200);
-        		// doc.rect(x, y, labelWidth, labelHeight);
+			const barcodeDataUrl = barcodeCanvas.toDataURL("image/png");
 
-        		if ((i + 1) % 30 === 0 && i + 1 < labelData.length) {
-            			doc.addPage();
-        		}
-    		}
+			// Layout
+			const barcodeWidth = 40;
+			const barcodeHeight = 10;
+			const barcodeYOffset = y + 8; // Position barcode nicely in top half
+			const barcodeTextYOffset = barcodeYOffset + barcodeHeight + 4;
 
-    		const today = new Date().toISOString().slice(0, 10);
-    		doc.save(`Chemical_Labels_${today}.pdf`);
+			// Add barcode
+			doc.addImage(
+				barcodeDataUrl,
+				"PNG",
+				x + (labelWidth - barcodeWidth) / 2,
+				barcodeYOffset,
+				barcodeWidth,
+				barcodeHeight
+			);
+
+			// Add barcode number (text)
+			doc.setFont("helvetica", "normal");
+			doc.setFontSize(8);
+			const barcodeText = item["Barcode"];
+			const textWidth = doc.getTextWidth(barcodeText);
+			doc.text(barcodeText, x + (labelWidth - textWidth) / 2, barcodeTextYOffset);
+
+			// Optional: Draw label outline
+			// doc.setDrawColor(200);
+			// doc.rect(x, y, labelWidth, labelHeight);
+	
+			if ((i + 1) % 30 === 0 && i + 1 < labelData.length) {
+				doc.addPage();
+			}
+		}
+
+		const today = new Date().toISOString().slice(0, 10);
+		doc.save(`Chemical_Labels_${today}.pdf`);
 	}
-
 	if ('serviceWorker' in navigator) {
  		navigator.serviceWorker.register('service-worker.js').then(() => {
     			console.log("✅ Service Worker Registered");
