@@ -81,6 +81,7 @@ button {
 	border-radius: 6px;
 	cursor: pointer;
 	font-size: 16px;
+	margin-top: 10px;
 	transition: background-color 0.3s ease;
 }
 
@@ -151,3 +152,20 @@ button:disabled {
 	opacity: 0.6;
 	cursor: not-allowed;
 }
+
+#search-input {
+    height: 40px; /* Adjust this value as needed */
+    flex: 1; /* Make the input take up available space */
+}
+
+.search-chemicals {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Add more space between the elements */
+    width: 100%;
+}
+
+.search-chemicals input {
+    margin-bottom: 10px; /* Optional: Adds space between search bar and button */
+}
+
