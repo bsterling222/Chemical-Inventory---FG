@@ -221,10 +221,8 @@
         		tbody.appendChild(tr);
     		});
 
-    		table.appendChild(tbody);
-    		preview.appendChild(table);
 
-    		// Create buttons to select/deselect all
+		// Create buttons to select/deselect all
    		const buttonContainer = document.createElement('div');
     		buttonContainer.style.margin = "10px 0";
 
@@ -238,8 +236,10 @@
 
     		buttonContainer.appendChild(selectAllBtn);
    		buttonContainer.appendChild(deselectAllBtn);
+		preview.appendChild(buttonContainer);
 
-    		preview.appendChild(buttonContainer);
+    		table.appendChild(tbody);
+    		preview.appendChild(table);
 	}
 
 	function generateRandomBarcode() {
