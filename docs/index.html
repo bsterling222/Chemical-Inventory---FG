@@ -538,6 +538,35 @@
     	URL.revokeObjectURL(url);
 	}
 
+	function wrapText(doc, text, maxWidth, maxCharsPerLine = 30) {
+		const words = text.split(" ");
+		const lines = [];
+		let currentLine = "";
+
+		for (let i = 0; i < words.length; i++) {
+			let word = words[i].trim();
+			let testLine = currentLine ? currentLine + " " + word : word;
+
+			if (doc.getTextWidth(testLine) < maxWidth && testLine.length <= maxCharsPerLine) {
+				currentLine = testLine;
+			} else {
+				if (currentLine) lines.push(currentLine);
+				while (word.length > 0) {
+					let cutoff = Math.min(word.length, maxCharsPerLine);
+					while (cutoff > 0 && (doc.getTextWidth(word.slice(0, cutoff)) > maxWidth)) {
+						cutoff--;
+					}
+					if (cutoff === 0) break;
+					lines.push(word.slice(0, cutoff));
+					word = word.slice(cutoff);
+				}
+				currentLine = word;
+			}
+		}
+		if (currentLine) lines.push(currentLine);
+		return lines;
+	}
+
 	async function generateLabels() {
 		const selectedIndexes = Array.from(document.querySelectorAll('.label-checkbox'))
 			.filter(cb => cb.checked)
@@ -568,7 +597,7 @@
 		for (let i = 0; i < labelData.length; i++) {
 			const item = labelData[i];
 
-			const row = Math.floor((i % 30) / labelsPerRow); // 30 labels per page
+			const row = Math.floor((i % 30) / labelsPerRow);
 			const col = i % labelsPerRow;
 
 			const x = marginX + col * (labelWidth + spacingX);
@@ -603,33 +632,68 @@
 
 			const barcodeDataUrl = barcodeCanvas.toDataURL("image/png");
 
-			// Layout
+			// Layout variables
+			const nameTop = y + 4;
+			const nameLineHeight = 4;
+			const infoSpacing = 1.5;
+			const barcodeSpacing = 2;
 			const barcodeWidth = 40;
-			const barcodeHeight = 10;
-			const barcodeYOffset = y + 8; // Position barcode nicely in top half
-			const barcodeTextYOffset = barcodeYOffset + barcodeHeight + 4;
+			const barcodeHeight = 5;
+			const maxNameLines = 2;
 
-			// Add barcode
+			// Chemical Name with autoshrink and wrapping
+			let fontSize = 9;
+			doc.setFont("helvetica", "bold");
+			doc.setFontSize(fontSize);
+
+			let nameLines = wrapText(doc, item["Chemical Name"], labelWidth);
+			while (nameLines.length > maxNameLines && fontSize > 6) {
+				fontSize -= 0.5;
+				doc.setFontSize(fontSize);
+				nameLines = wrapText(doc, item["Chemical Name"], labelWidth);
+			}
+			nameLines = nameLines.slice(0, maxNameLines);
+
+			nameLines.forEach((line, idx) => {
+				const yOffset = nameTop + idx * nameLineHeight;
+				const xOffset = x + (labelWidth - doc.getTextWidth(line)) / 2;
+				doc.text(line, xOffset, yOffset);
+			});
+
+			// CAS number
+			const cas = item["CAS Number"] || "N/A";
+			const infoLine = `CAS: ${cas}`;
+			const infoYOffset = nameTop + nameLines.length * nameLineHeight + infoSpacing;
+			doc.setFont("helvetica", "normal");
+			doc.setFontSize(7);
+			const casTextWidth = doc.getTextWidth(infoLine);
+			doc.text(infoLine, x + (labelWidth - casTextWidth) / 2, infoYOffset);
+
+			// Barcode position
+			const barcodeYOffset = infoYOffset + barcodeSpacing;
+			const maxBarcodeYOffset = y + labelHeight - barcodeHeight - 4;
+			const finalBarcodeYOffset = Math.min(barcodeYOffset, maxBarcodeYOffset);
+
 			doc.addImage(
 				barcodeDataUrl,
 				"PNG",
 				x + (labelWidth - barcodeWidth) / 2,
-				barcodeYOffset,
+				finalBarcodeYOffset,
 				barcodeWidth,
 				barcodeHeight
 			);
 
-			// Add barcode number (text)
-			doc.setFont("helvetica", "normal");
-			doc.setFontSize(8);
+			// Barcode text
 			const barcodeText = item["Barcode"];
-			const textWidth = doc.getTextWidth(barcodeText);
-			doc.text(barcodeText, x + (labelWidth - textWidth) / 2, barcodeTextYOffset);
+			const barcodeTextYOffset = finalBarcodeYOffset + barcodeHeight + 3;
+			doc.setFontSize(8);
+			const barcodeTextWidth = doc.getTextWidth(barcodeText);
+			doc.text(barcodeText, x + (labelWidth - barcodeTextWidth) / 2, barcodeTextYOffset);
 
-			// Optional: Draw label outline
+			// Optional: Draw label border for testing
 			// doc.setDrawColor(200);
 			// doc.rect(x, y, labelWidth, labelHeight);
-	
+
 			if ((i + 1) % 30 === 0 && i + 1 < labelData.length) {
 				doc.addPage();
 			}
@@ -638,6 +702,7 @@
 		const today = new Date().toISOString().slice(0, 10);
 		doc.save(`Chemical_Labels_${today}.pdf`);
 	}
+
 	if ('serviceWorker' in navigator) {
  		navigator.serviceWorker.register('service-worker.js').then(() => {
     			console.log("✅ Service Worker Registered");
