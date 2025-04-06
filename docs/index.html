@@ -56,6 +56,7 @@
 		<div class="actions-container">
         		<button onclick="searchChemicals()">🔍 Search Chemicals</button>
         		<button onclick="startAudit()">📦 Inventory Audit</button>
+			<button onclick="openAdminPanel()">🔧 Manage Users</button>
     		</div>
 
    <!-- Upload Excel -->
@@ -98,13 +99,33 @@
 			
     			<ul id="search-results"></ul>
 		</div>
+		
+		<div id="admin-section" class="home-container" style="display: none;">
+  			<h3>Manage Allowed Users</h3>
+  			<button onclick="closeAdminPanel()">🔙 Back to Menu</button>
+
+  			<input type="password" id="admin-password" placeholder="Enter admin password" />
+  			<button onclick="checkAdminAccess()">Unlock</button>
+
+  			<div id="user-management-panel" style="display: none; margin-top: 20px;">
+    			<textarea id="user-list" rows="8" style="width: 100%;"></textarea>
+    			<button onclick="saveUserList()">💾 Save User List</button>
+  </div>
+</div>
+
 	</div>
     <!-- Scripts -->
 <script>
 
 	let workingData = []; // stores uploaded data + barcodes
-
-
+	const allowedUsers = ["BAS", "BS", "EN", "SH", "ML", "MAT", "MW", "If"];
+	
+	document.addEventListener("DOMContentLoaded", () => {
+  		const storedUsers = localStorage.getItem("allowedUsers");
+  		if (storedUsers) {
+    			allowedUsers = JSON.parse(storedUsers);
+  		}
+		
 	// Sample chemicalData (optional/fallback)
     	let chemicalData = [
         	// fallback data or empty if switching to Excel data only
@@ -267,8 +288,13 @@
 		
 		const username = document.getElementById('username').value.trim();
 		
-		if(username === "") {
-			alert("Please enter your name.");
+		if (username === "") {
+			alert("Please enter your initials.");
+			return;
+		}
+
+		if (!allowedUsers.includes(username)) {
+			alert("Access denied. These initials are not authorized to use this app.");
 			return;
 		}
 
@@ -790,6 +816,42 @@
   		// Show home section again
   		document.getElementById('home-section').style.display = 'block';
 	}
+
+	const ADMIN_PASSWORD = "FritschGroup"; // Replace this with a better password later
+
+	function openAdminPanel() {
+  		document.getElementById("home-section").style.display = "none";
+  		document.getElementById("admin-section").style.display = "block";
+	}
+
+	function closeAdminPanel() {
+  		document.getElementById("admin-section").style.display = "none";
+  		document.getElementById("home-section").style.display = "block";
+  		document.getElementById("admin-password").value = "";
+  		document.getElementById("user-management-panel").style.display = "none";
+	}
+
+	function checkAdminAccess() {
+  		const enteredPassword = document.getElementById("admin-password").value;
+  		if (enteredPassword === ADMIN_PASSWORD) {
+    			document.getElementById("user-management-panel").style.display = "block";
+    			document.getElementById("user-list").value = allowedUsers.join("\n");
+  		} else {
+    			alert("❌ Incorrect admin password.");
+  		}
+	}
+
+	function saveUserList() {
+  		const userInput = document.getElementById("user-list").value;
+  		allowedUsers = userInput
+    			.split("\n")
+    			.map(name => name.trim().toUpperCase())
+    			.filter(Boolean);
+		// Save to localStorage
+  		localStorage.setItem("allowedUsers", JSON.stringify(allowedUsers));
+
+  		alert("✅ User list saved successfully!");
+	}	
 </script>
 
 <!-- Hidden SVG container used for generating barcodes -->
