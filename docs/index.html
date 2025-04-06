@@ -1,279 +1,230 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fritsch Group - Chemical Inventory System</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Fritsch Group - Chemical Inventory System</title>
 
-  <!-- Web App Metadata -->
-  <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="flask-icon-192.png" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="theme-color" content="#333333" />
-  <meta name="apple-mobile-web-app-title" content="Chemical Inventories" />
+	<link rel="manifest" href="manifest.json">
+	<link rel="apple-touch-icon" href="flask-icon-192.png">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="default">
+	<meta name="apple-mobile-web-app-title" content="Chemical Inventories">
+	<meta name="theme-color" content="#333333">
 
-  <!-- Fonts & Libraries -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-    rel="stylesheet"
-  />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+	<!-- Barcode Scanner -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
 
-  <!-- Roboto Embedded Font for jsPDF -->
-  <script>
-    window.jsPDF = window.jspdf.jsPDF;
+	<!-- Excel Reader -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    const robotoFontBase64 = 'AAEAAAATAQAABAAwRFNJRwAAAAAAAAEAAAAVAAAAHEdERUYAAADgAAAAIAAAACBPUy8yAAABHAAAABgAAAAkY21hcAAAAVgAAAEeAAABYmdseWYAAAHoAAABMAAAADZnbHlmAAACcAAAAPQAAAFQaGVhZAAAAtkAAAE8AAAANmhoZWQAAALwAAAAMAAAACRobXR4AAADNAAAAEYAAAAYbG9jYQAABKAAAADQAAAAIG1heHAAABQIAAAABgAAAAgbmFtZQAABRgAAAE0AAABJnBvc3QAAAXEAAABNAAAAFV2ZXJzAAAGGAAAADUAAAAkZ1hZWiAAAAYAAAABAAAAAQAEAAMAAAABAAYAAwAEAAQAAQAAAAAAAAABAgAAAAEAAgACAAAAEgAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAD8zw==';
-
-    jsPDF.API.events.push([
-      'addFonts',
-      function () {
-        this.addFileToVFS('Roboto-Regular.ttf', robotoFontBase64);
-        this.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
-      }
-    ]);
-  </script>
+	<!-- jsPDF & JsBarcode -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 </head>
-
 <body>
-  <!-- HEADER -->
-  <header class="page-title">
-    <h1>Fritsch Group Chemical Inventory</h1>
-  </header>
+	<header class="page-title">
+		<h1>Fritsch Group Chemical Inventory</h1>
+	</header>
 
-  <!-- MAIN ACTIONS -->
-  <div class="home-container" id="home-section">
-    <h2>Hello! What would you like to do?</h2>
-    <div>
-      <button onclick="generateLabels()">🏷️ Generate Labels</button>
-      <input type="file" id="excel-file" accept=".xlsx" onchange="handleFileUpload(event)" />
-    </div>
-    <div id="excel-preview" style="margin-top: 20px;"></div>
-  </div>
+	<div id="login-section" class="login-container">
+		<h2>Login</h2>
+		<input type="text" id="username" placeholder="Name:" />
+		<button onclick="loginUser()">Login</button>
+	</div>
 
-  <script>
-    let workingData = [];
+	<div id="home-section" class="home-container" style="display: none;">
+		<h2>Hello, <span id="display-name"></span>! What would you like to do?</h2>
+		<div class="actions-container">
+			<button onclick="searchChemicals()">🔍 Search Chemicals</button>
+			<button onclick="startAudit()">📦 Inventory Audit</button>
+		</div>
 
-    const robotoFontName = "Roboto";
+		<div style="margin-top: 40px;">
+			<h3>Upload Chemical Inventory Excel</h3>
+			<input type="file" id="excel-file" accept=".xlsx, .xls, .csv" onchange="handleFileUpload(event)" />
+			<button onclick="downloadModifiedFile()" style="margin-top: 30px;">💾 Download File with Barcodes</button>
+			<button onclick="generateLabels()" style="margin-top: 30px;">🏷️ Generate Labels</button>
+			<div id="excel-preview" style="margin-top: 20px;"></div>
+		</div>
+	</div>
 
-    // Load Excel
-    function handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+	<div id="audit-section" style="display: none; margin-top: 30px;">
+		<h3>Inventory Audit</h3>
+		<button onclick="InvexitSearch()" style="margin-bottom: 30px;">🔙 Back to Menu</button>
+		<button onclick="scanAuditBarcode()">📷 Scan Chemical</button>
+		<ul id="audit-results" style="margin-top: 30px;"></ul>
+		<button onclick="downloadAuditLog()" style="margin-top: 30px;">💾 Download Audit Log</button>
+	</div>
 
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: "array" });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const json = XLSX.utils.sheet_to_json(sheet);
+	<div class="search-chemicals" id="search-chemicals" style="display: none; margin-top: 30px;">
+		<h3>Search Chemicals</h3>
+		<button onclick="exitSearch()" style="margin-bottom: 30px;">🔙 Back to Menu</button>
+		<div style="display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 30px;">
+			<input type="text" id="search-input" placeholder="Search by name or CAS" oninput="performSearch()" style="flex: 1; min-width: 100px;" />
+			<button type="button" onclick="clearSearch()">❌ Clear</button>
+		</div>
+		<button onclick="scanBarcode()">📷 Scan Barcode</button>
+		<ul id="search-results"></ul>
+	</div>
 
-        workingData = json.map(item => ({
-          ...item,
-          Barcode: item["Barcode"] || generateRandomBarcode()
-        }));
+	<!-- Hidden barcode container -->
+	<div style="display: none;">
+		<svg id="barcode-preview"></svg>
+	</div>
 
-        displayExcelPreview(workingData);
-      };
-      reader.readAsArrayBuffer(file);
-    }
+	<script>
+		window.jsPDF = window.jspdf.jsPDF;
 
-    function displayExcelPreview(data) {
-      const preview = document.getElementById("excel-preview");
-      preview.innerHTML = "";
-      if (data.length === 0) return;
+		function wrapText(doc, text, maxWidth, maxCharsPerLine = 30) {
+			const words = text.split(" ");
+			const lines = [];
+			let currentLine = "";
 
-      const table = document.createElement("table");
-      const thead = document.createElement("thead");
-      const headRow = document.createElement("tr");
+			for (let i = 0; i < words.length; i++) {
+				let word = words[i].trim();
+				let testLine = currentLine ? currentLine + " " + word : word;
 
-      const selectHeader = document.createElement("th");
-      selectHeader.textContent = "Select";
-      headRow.appendChild(selectHeader);
+				if (doc.getTextWidth(testLine) < maxWidth && testLine.length <= maxCharsPerLine) {
+					currentLine = testLine;
+				} else {
+					if (currentLine) lines.push(currentLine);
+					while (word.length > 0) {
+						let cutoff = Math.min(word.length, maxCharsPerLine);
+						while (cutoff > 0 && (doc.getTextWidth(word.slice(0, cutoff)) > maxWidth)) {
+							cutoff--;
+						}
+						if (cutoff === 0) break;
+						lines.push(word.slice(0, cutoff));
+						word = word.slice(cutoff);
+					}
+					currentLine = word;
+				}
+			}
+			if (currentLine) lines.push(currentLine);
+			return lines;
+		}
 
-      Object.keys(data[0]).forEach(key => {
-        const th = document.createElement("th");
-        th.textContent = key;
-        headRow.appendChild(th);
-      });
+		async function generateLabels() {
+			const selectedIndexes = Array.from(document.querySelectorAll('.label-checkbox'))
+				.filter(cb => cb.checked)
+				.map(cb => parseInt(cb.dataset.index));
 
-      thead.appendChild(headRow);
-      table.appendChild(thead);
+			const labelData = selectedIndexes.map(i => workingData[i]);
 
-      const tbody = document.createElement("tbody");
-      data.forEach((row, index) => {
-        const tr = document.createElement("tr");
+			if (labelData.length === 0) {
+				alert("Please select at least one chemical to generate labels.");
+				return;
+			}
 
-        const checkboxCell = document.createElement("td");
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.className = "label-checkbox";
-        checkbox.dataset.index = index;
-        checkboxCell.appendChild(checkbox);
-        tr.appendChild(checkboxCell);
+			const doc = new jsPDF({ unit: "mm", format: "letter" });
+			doc.setFont("helvetica", "normal");
 
-        Object.values(row).forEach(val => {
-          const td = document.createElement("td");
-          td.textContent = val || "";
-          tr.appendChild(td);
-        });
+			const labelsPerRow = 3;
+			const labelsPerColumn = 10;
+			const labelWidth = 66.675;
+			const labelHeight = 25.4;
+			const marginX = 3.8;
+			const marginY = 12.3;
+			const spacingX = 4.175;
+			const spacingY = 0.2;
 
-        tbody.appendChild(tr);
-      });
+			for (let i = 0; i < labelData.length; i++) {
+				const item = labelData[i];
 
-      table.appendChild(tbody);
-      preview.appendChild(table);
-    }
+				const row = Math.floor((i % 30) / labelsPerRow);
+				const col = i % labelsPerRow;
+				const x = marginX + col * (labelWidth + spacingX);
+				const y = marginY + row * (labelHeight + spacingY);
 
-    function generateRandomBarcode() {
-      return Math.floor(1000000000000000 + Math.random() * 9e15).toString();
-    }
+				// Barcode generation
+				const barcodeSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+				JsBarcode(barcodeSvg, item["Barcode"], {
+					format: "CODE128",
+					displayValue: false,
+					height: 10,
+					width: 1.5,
+					margin: 0
+				});
 
-    function wrapText(doc, text, maxWidth, maxCharsPerLine = 30) {
-      const words = text.split(" ");
-      const lines = [];
-      let currentLine = "";
+				const barcodeCanvas = document.createElement("canvas");
+				const svgData = new XMLSerializer().serializeToString(barcodeSvg);
+				const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+				const url = URL.createObjectURL(svgBlob);
 
-      for (let i = 0; i < words.length; i++) {
-        let word = words[i].trim();
-        let testLine = currentLine ? currentLine + " " + word : word;
+				const img = new Image();
+				await new Promise(resolve => {
+					img.onload = function () {
+						const ctx = barcodeCanvas.getContext("2d");
+						barcodeCanvas.width = img.width;
+						barcodeCanvas.height = img.height;
+						ctx.drawImage(img, 0, 0);
+						URL.revokeObjectURL(url);
+						resolve();
+					};
+					img.src = url;
+				});
 
-        if (doc.getTextWidth(testLine) < maxWidth && testLine.length <= maxCharsPerLine) {
-          currentLine = testLine;
-        } else {
-          if (currentLine) lines.push(currentLine);
-          while (word.length > 0) {
-            let cutoff = Math.min(word.length, maxCharsPerLine);
-            while (cutoff > 0 && doc.getTextWidth(word.slice(0, cutoff)) > maxWidth) {
-              cutoff--;
-            }
-            if (cutoff === 0) break;
-            lines.push(word.slice(0, cutoff));
-            word = word.slice(cutoff);
-          }
-          currentLine = word;
-        }
-      }
-      if (currentLine) lines.push(currentLine);
-      return lines;
-    }
+				const barcodeDataUrl = barcodeCanvas.toDataURL("image/png");
 
-    async function generateLabels() {
-      const selectedIndexes = Array.from(document.querySelectorAll(".label-checkbox"))
-        .filter(cb => cb.checked)
-        .map(cb => parseInt(cb.dataset.index));
+				// Layout
+				const nameTop = y + 4;
+				const nameLineHeight = 4;
+				const infoSpacing = 1.5;
+				const barcodeSpacing = 2;
+				const barcodeWidth = 40;
+				const barcodeHeight = 5;
+				const maxNameLines = 2;
 
-      const labelData = selectedIndexes.map(i => workingData[i]);
+				// Chemical Name
+				let fontSize = 9;
+				doc.setFontSize(fontSize);
+				let nameLines = wrapText(doc, item["Chemical Name"], labelWidth);
+				while (nameLines.length > maxNameLines && fontSize > 6) {
+					fontSize -= 0.5;
+					doc.setFontSize(fontSize);
+					nameLines = wrapText(doc, item["Chemical Name"], labelWidth);
+				}
+				nameLines = nameLines.slice(0, maxNameLines);
+				nameLines.forEach((line, idx) => {
+					const yOffset = nameTop + idx * nameLineHeight;
+					const xOffset = x + (labelWidth - doc.getTextWidth(line)) / 2;
+					doc.text(line, xOffset, yOffset);
+				});
 
-      if (labelData.length === 0) {
-        alert("Please select at least one chemical to generate labels.");
-        return;
-      }
+				// CAS number
+				const cas = item["CAS Number"] || "N/A";
+				const infoLine = `CAS: ${cas}`;
+				const infoYOffset = nameTop + nameLines.length * nameLineHeight + infoSpacing;
+				doc.setFontSize(7);
+				const casTextWidth = doc.getTextWidth(infoLine);
+				doc.text(infoLine, x + (labelWidth - casTextWidth) / 2, infoYOffset);
 
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ unit: "mm", format: "letter" });
+				// Barcode image
+				const barcodeYOffset = infoYOffset + barcodeSpacing;
+				const maxBarcodeYOffset = y + labelHeight - barcodeHeight - 4;
+				const finalBarcodeYOffset = Math.min(barcodeYOffset, maxBarcodeYOffset);
+				doc.addImage(barcodeDataUrl, "PNG", x + (labelWidth - barcodeWidth) / 2, finalBarcodeYOffset, barcodeWidth, barcodeHeight);
 
-      doc.addFileToVFS("Roboto-Regular.ttf", robotoFontBase64);
-      doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
-      doc.setFont("Roboto", "normal");
+				// Barcode text
+				const barcodeText = item["Barcode"];
+				const barcodeTextYOffset = finalBarcodeYOffset + barcodeHeight + 3;
+				doc.setFontSize(8);
+				const barcodeTextWidth = doc.getTextWidth(barcodeText);
+				doc.text(barcodeText, x + (labelWidth - barcodeTextWidth) / 2, barcodeTextYOffset);
 
-      const labelWidth = 66.675;
-      const labelHeight = 25.4;
-      const spacingX = 4.175;
-      const spacingY = 0.2;
-      const marginX = 3.8;
-      const marginY = 12.3;
+				// Optional: draw label border for debugging
+				// doc.setDrawColor(200);
+				// doc.rect(x, y, labelWidth, labelHeight);
 
-      for (let i = 0; i < labelData.length; i++) {
-        const item = labelData[i];
-        const row = Math.floor((i % 30) / 3);
-        const col = i % 3;
-        const x = marginX + col * (labelWidth + spacingX);
-        const y = marginY + row * (labelHeight + spacingY);
+				if ((i + 1) % 30 === 0 && i + 1 < labelData.length) {
+					doc.addPage();
+				}
+			}
 
-        // Create barcode
-        const barcodeSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        JsBarcode(barcodeSvg, item["Barcode"], {
-          format: "CODE128",
-          displayValue: false,
-          height: 10,
-          width: 1.5,
-          margin: 0
-        });
-
-        const canvas = document.createElement("canvas");
-        const svgBlob = new Blob([new XMLSerializer().serializeToString(barcodeSvg)], { type: "image/svg+xml" });
-        const url = URL.createObjectURL(svgBlob);
-
-        const img = new Image();
-        await new Promise(resolve => {
-          img.onload = () => {
-            const ctx = canvas.getContext("2d");
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-            URL.revokeObjectURL(url);
-            resolve();
-          };
-          img.src = url;
-        });
-
-        const barcodeDataUrl = canvas.toDataURL("image/png");
-
-        // Draw name
-        const nameTop = y + 4;
-        const nameLineHeight = 4;
-        let fontSize = 9;
-        doc.setFontSize(fontSize);
-
-        let nameLines = wrapText(doc, item["Chemical Name"], labelWidth);
-        while (nameLines.length > 2 && fontSize > 6) {
-          fontSize -= 0.5;
-          doc.setFontSize(fontSize);
-          nameLines = wrapText(doc, item["Chemical Name"], labelWidth);
-        }
-
-        nameLines.slice(0, 2).forEach((line, idx) => {
-          const yOffset = nameTop + idx * nameLineHeight;
-          const xOffset = x + (labelWidth - doc.getTextWidth(line)) / 2;
-          doc.text(line, xOffset, yOffset);
-        });
-
-        // CAS
-        const cas = `CAS: ${item["CAS Number"] || "N/A"}`;
-        doc.setFontSize(7);
-        const casYOffset = nameTop + nameLines.length * nameLineHeight + 1.5;
-        doc.text(cas, x + (labelWidth - doc.getTextWidth(cas)) / 2, casYOffset);
-
-        // Barcode image
-        const barcodeYOffset = casYOffset + 2;
-        doc.addImage(
-          barcodeDataUrl,
-          "PNG",
-          x + (labelWidth - 40) / 2,
-          barcodeYOffset,
-          40,
-          5
-        );
-
-        // Barcode number
-        const barcodeText = item["Barcode"];
-        doc.setFontSize(8);
-        doc.text(barcodeText, x + (labelWidth - doc.getTextWidth(barcodeText)) / 2, barcodeYOffset + 8.5);
-
-        if ((i + 1) % 30 === 0 && i + 1 < labelData.length) {
-          doc.addPage();
-        }
-      }
-
-      const today = new Date().toISOString().slice(0, 10);
-      doc.save(`Chemical_Labels_${today}.pdf`);
-    }
-  </script>
+			const today = new Date().toISOString().slice(0, 10);
+			doc.save(`Chemical_Labels_${today}.pdf`);
+		}
+	</script>
 </body>
 </html>
