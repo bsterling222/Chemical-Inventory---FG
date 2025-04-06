@@ -47,7 +47,7 @@
 	<div id="login-section" class="login-container">
 		<h2>Login</h2>
 		<input type="text" id="username" placeholder="Initials: " />
-		<button onclick="loginUser()">Login</button>
+		<button id="login-btn">Login</button>
 	</div>
 
     <!-- Home Page Section (Initially Hidden) -->
@@ -325,6 +325,12 @@
 				loginUser();
 			}
 		});
+		
+		// ✅ Add this to bind the login button
+		const loginBtn = document.getElementById("login-btn");
+		if (loginBtn) {
+			loginBtn.addEventListener("click", loginUser);
+		}
 	});
 
 	function searchChemicals() {
@@ -849,8 +855,7 @@
   		localStorage.setItem("allowedUsers", JSON.stringify(allowedUsers));
 
   		alert("✅ User list saved successfully!");
-	}	
-});
+	}
 </script>
 
 <!-- Hidden SVG container used for generating barcodes -->
