@@ -1,117 +1,98 @@
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f5f5f5;
-    color: #333333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
+	font-family: 'Roboto', sans-serif;
+	background-color: #eaeaea;
+	color: #2a2a2a;
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+	padding-top: 30px;
+	margin: 0;
 }
+
 .page-title {
-    text-align: center;
-    padding: 20px 0;
-    background-color: #ffffff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    font-family: 'Roboto', sans-serif;
+	text-align: center;
+	padding: 20px 0;
+	background-color: #ffffff;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+	width: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 100;
 }
 
 .page-title h1 {
-    margin: 0;
-    font-size: 24px;
-    color: #333333;
+	margin: 0;
+	font-size: 26px;
+	color: #111;
 }
 
-.login-container {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    width: 90%;
-    max-width: 300px;
-    text-align: center;
+.login-container,
+.home-container,
+.search-chemicals,
+#audit-section {
+	background-color: #ffffff;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+	width: 90%;
+	max-width: 600px;
+	margin: 20px auto;
 }
 
-.home-container {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    width: 90%;
-    max-width: 500px;
-    text-align: center;
-}
 .actions-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 25px;
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+	margin-top: 25px;
 }
 
-.actions-container button {
-    padding: 12px 20px;
-    background-color: #333333;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.actions-container button:hover {
-    background-color: #555555;
-}
-
-input[type="text"] {
-    width: 90%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 16px;
-    text-align: center;
-}
-
+.actions-container button,
 button {
-    width: 95%;
-    padding: 10px;
-    background-color: #333333;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-}
-.search-chemicals {
-    text-align: left;
-    max-width: 500px;
-    margin: 0 auto;
+	width: 100%;
+	padding: 12px;
+	background-color: #333333;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 16px;
 }
 
-.search-chemicals input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    font-size: 16px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-}
-
-#search-results {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-#search-results li {
-    padding: 10px;
-    background-color: #f9f9f9;
-    margin-bottom: 8px;
-    border-radius: 5px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-
+.actions-container button:hover,
 button:hover {
-    background-color: #555555;
+	background-color: #4a4a4a;
+}
+
+input[type="text"],
+input[type="file"] {
+	width: 100%;
+	padding: 10px;
+	margin-bottom: 15px;
+	border-radius: 6px;
+	border: 1px solid #ccc;
+	font-size: 16px;
+	text-align: center;
+}
+
+#search-results,
+#audit-results {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+#search-results li,
+#audit-results li {
+	padding: 10px;
+	background-color: #f4f4f4;
+	margin-bottom: 10px;
+	border-left: 4px solid #888;
+	border-radius: 6px;
+	box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
 }
