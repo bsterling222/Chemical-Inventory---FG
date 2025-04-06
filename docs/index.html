@@ -117,13 +117,7 @@
 
 	let workingData = []; // stores uploaded data + barcodes
 	let allowedUsers = ["BAS", "BS", "EN", "SH", "ML", "MAT", "MW", "If"];
-	
-	document.addEventListener("DOMContentLoaded", () => {
-  		const storedUsers = localStorage.getItem("allowedUsers");
-  		if (storedUsers) {
-    			allowedUsers = JSON.parse(storedUsers);
-  		}
-		
+			
 	// Sample chemicalData (optional/fallback)
     	let chemicalData = [
         	// fallback data or empty if switching to Excel data only
@@ -539,7 +533,7 @@
 				successMsg.style.borderRadius = "5px";
 				successMsg.style.zIndex = "10000";
 				document.body.appendChild(successMsg);
-				setTimeout(() => successMsg.remove(), 3);
+				setTimeout(() => successMsg.remove(), 2000);
 
 			} else if (!recentlyScanned.has(code)) {
 				recentlyScanned.add(code);
@@ -558,7 +552,7 @@
 				msg.style.borderRadius = "5px";
 				msg.style.zIndex = "10000";
 				document.body.appendChild(msg);
-				setTimeout(() => msg.remove(), 3);
+				setTimeout(() => msg.remove(), 2000);
 			}
 				
 		});
