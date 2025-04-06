@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width = device-width, initial-scale=1.0">
-	<title>Fritsch Group - Chemical Inventory System</title>
+	<title>Fritsch Group Chemical Inventory</title>
 
 	<!-- Link the Web App Manifest -->
 	<link rel="manifest" href="manifest.json">
@@ -46,7 +46,7 @@
     <!-- Login Section -->
 	<div id="login-section" class="login-container">
 		<h2>Login</h2>
-		<input type="text" id="username" placeholder="Name:" />
+		<input type="text" id="username" placeholder="Initials: " />
 		<button onclick="loginUser()">Login</button>
 	</div>
 
@@ -146,6 +146,7 @@
 	function clearSearch() {
   		const input = document.getElementById('search-input');
   		input.value = "";           // Clear input field
+		document.getElementById('search-results').innerHTML = "";
 	}
 
 	function clearFile() {
@@ -296,7 +297,16 @@
             	// Personalize the greeting
             	document.getElementById('display-name').textContent = username;
 	}	
-
+	
+	document.addEventListener('DOMContentLoaded', () => {
+		const usernameInput = document.getElementById("username");
+		usernameInput.addEventListener("keydown", function(event) {
+			if (event.key === "Enter") {
+				event.preventDefault();
+				loginUser();
+			}
+		});
+	});
 
 	function searchChemicals() {
   		document.getElementById('search-chemicals').style.display = 'block';
