@@ -118,7 +118,7 @@
 <script>
 
 	let workingData = []; // stores uploaded data + barcodes
-	const allowedUsers = ["BAS", "BS", "EN", "SH", "ML", "MAT", "MW", "If"];
+	let allowedUsers = ["BAS", "BS", "EN", "SH", "ML", "MAT", "MW", "If"];
 	
 	document.addEventListener("DOMContentLoaded", () => {
   		const storedUsers = localStorage.getItem("allowedUsers");
