@@ -76,16 +76,16 @@
     			<h3>Inventory Audit</h3>
 			<button onclick="InvexitSearch()" style="margin-bottom: 30px;">🔙 Back to Menu</button>
     			<button onclick="scanAuditBarcode()">📷 Scan Chemical</button>
-    			<ul id="audit-results" style="margin-top: 30px;"></ul>
 			<button onclick="downloadAuditLog()" style="margin-top: 30px;">
     				💾 Download Audit Log
 			</button>
+			<ul id="audit-results" style="margin-top: 30px;"></ul>
 		</div>
 		  <!-- Search Button -->
 		<div class="search-chemicals" id="search-chemicals" style="display: none; margin-top: 30px;">
     			<h3>Search Chemicals</h3>
 			<button onclick="exitSearch()" style="margin-bottom: 30px;">🔙 Back to Menu</button>
-    			
+    			<button onclick="scanBarcode()">📷 Scan Barcode</button>
 			<div style="display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 30px;">
   				<input
     					type="text"
@@ -96,7 +96,7 @@
   				/>
   				<button type="button" onclick="clearSearch()">❌ Clear</button>
 			</div>
-			<button onclick="scanBarcode()">📷 Scan Barcode</button>
+			
 			
     			<ul id="search-results"></ul>
 		</div>
@@ -424,57 +424,63 @@
 	}
 
 	function scanAuditBarcode() {
-    		const scannerOverlay = document.createElement('div');
-    		scannerOverlay.id = 'scanner-overlay';
-    		scannerOverlay.style = `
-        		position: fixed; top: 0; left: 0;
-       			width: 100vw; height: 100vh;
-        		background-color: rgba(0,0,0,0.8);
-        		z-index: 9999;
-    		`;
-    		scannerOverlay.innerHTML = `
-        		<div style="position: relative; width: 100%; height: 100%;">
-            			<button onclick="stopScanner()" style="position: absolute; top: 10px; right: 10px; z-index: 10000;">✖ Close</button>
-            			<div id="scanner" style="width: 100%; height: 100%;"></div>
-        		</div>
-    		`;
-    		document.body.appendChild(scannerOverlay);
+		const scannerOverlay = document.createElement('div');
+		scannerOverlay.id = 'scanner-overlay';
+		scannerOverlay.style = `
+			position: fixed; top: 0; left: 0;
+			width: 100vw; height: 100vh;
+			background-color: rgba(0,0,0,0.8);
+			z-index: 9999;
+		`;
+		scannerOverlay.innerHTML = `
+			<div style="position: relative; width: 100%; height: 100%;">
+				<button onclick="stopScanner()" style="position: absolute; top: 10px; right: 10px; z-index: 10000;">✖ Close</button>
+				<div id="scanner" style="width: 100%; height: 100%;"></div>
+			</div>
+		`;
+		document.body.appendChild(scannerOverlay);
 
-    		Quagga.init({
-        		inputStream: {
-            			type: "LiveStream",
-            			target: document.querySelector('#scanner'),
-            			constraints: { facingMode: "environment" }
-        		},
-        		decoder: {
-            			readers: ["code_128_reader", "ean_reader", "ean_8_reader", "upc_reader"]
-        		}
-    		}, function(err) {
-        		if (err) {
-            			alert("Failed to start scanner: " + err);
-            			stopScanner();
-            			return;
-        		}
-        		Quagga.start();
-    		});
+		let recentlyScanned = new Set(); // To prevent repeated rapid scans
 
-    		Quagga.onDetected(function(result) {
-        		const code = result.codeResult.code;
-        		Quagga.stop();
-        		stopScanner();
+		Quagga.init({
+			inputStream: {
+				type: "LiveStream",
+				target: document.querySelector('#scanner'),
+				constraints: { facingMode: "environment" }
+			},
+			decoder: {
+				readers: ["code_128_reader", "ean_reader", "ean_8_reader", "upc_reader"]
+			}
+		}, function (err) {
+			if (err) {
+				alert("Failed to start scanner: " + err);
+				stopScanner();
+				return;
+			}
+			Quagga.start();
+		});
 
-        		const match = workingData.find(item => (item["Barcode"] || "").toString() === code);
+		Quagga.onDetected(function (result) {
+			const code = result.codeResult.code;
 
-        		if (match) {
-            			auditStatus[code] = {
-    					user: currentUsername,
-    					time: new Date().toLocaleString()
+			// Ignore duplicate scans within 3 seconds
+			if (recentlyScanned.has(code)) return;
+
+			recentlyScanned.add(code);
+			setTimeout(() => recentlyScanned.delete(code), 3000); // allow scanning same code again later
+
+			const match = workingData.find(item => (item["Barcode"] || "").toString() === code);
+
+			if (match) {
+				auditStatus[code] = {
+					user: currentUsername,
+					time: new Date().toLocaleString()
 				};
-            			updateAuditList();
-        		} else {
-            			alert("Scanned barcode not found in inventory.");
-        		}
-    		});
+				updateAuditList();
+			} else {
+				alert("Scanned barcode not found in inventory.");
+			}
+		});
 	}
 
 	function updateAuditList() {
