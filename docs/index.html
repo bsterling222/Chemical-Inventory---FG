@@ -543,6 +543,18 @@
     		const centerX = labelX + (labelWidth / 2) - (textWidth / 2);
     		doc.text(text, centerX, y);
 	}
+
+	function fitText(doc, text, maxWidth, defaultSize = 10, minSize = 6) {
+		doc.setFontSize(defaultSize);
+		let textWidth = doc.getTextWidth(text);
+
+		while (textWidth > maxWidth && doc.getFontSize() > minSize) {
+			doc.setFontSize(doc.getFontSize() - 1);
+			textWidth = doc.getTextWidth(text);
+		}
+	}
+
+
 	async function generateLabels() {
     		// 🔹 Get all selected checkboxes
     		const selectedIndexes = Array.from(document.querySelectorAll('.label-checkbox'))
@@ -609,9 +621,9 @@
         		const barcodeDataUrl = barcodeCanvas.toDataURL("image/png");
 
         		// Centered label layout
-        		doc.setFontSize(10);
         		doc.setFont(undefined, 'bold');
-        		centerText(doc, item["Chemical Name"], x, labelWidth, y + 6);
+			fitText(doc, item["Chemical Name"], labelWidth);  // Adjust font size to fit
+			centerText(doc, item["Chemical Name"], x, labelWidth, y + 6);
 
         		doc.setFont(undefined, 'normal');
         		const cas = item["CAS Number"] || "N/A";
