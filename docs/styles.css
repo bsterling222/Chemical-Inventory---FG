@@ -1,6 +1,6 @@
 body {
 	font-family: 'Roboto', sans-serif;
-	background-color: #eaeaea;
+	background-color: #f0f0f0; /* Lighter grey background */
 	color: #2a2a2a;
 	display: flex;
 	justify-content: center;
@@ -24,7 +24,7 @@ body {
 .page-title h1 {
 	margin: 0;
 	font-size: 26px;
-	color: #111;
+	color: #1a1a1a; /* Darker title color for contrast */
 }
 
 .login-container,
