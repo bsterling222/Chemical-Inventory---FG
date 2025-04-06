@@ -64,9 +64,9 @@ body {
 }
 
 button {
-	width: 100%;
+	width: 80%;
 	padding: 12px;
-	background-color: #333333;
+	background-color: #00b3b3;
 	color: white;
 	border: none;
 	border-radius: 6px;
