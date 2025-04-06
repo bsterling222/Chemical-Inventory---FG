@@ -544,11 +544,11 @@
     		doc.text(text, centerX, y);
 	}
 
-	function fitText(doc, text, maxWidth, defaultSize = 10, minSize = 6) {
+	function fitText(doc, text, maxWidth, defaultSize = 10, minSize = 4) {
 		doc.setFontSize(defaultSize);
 		let textWidth = doc.getTextWidth(text);
 
-		while (textWidth > maxWidth && doc.getFontSize() > minSize) {
+		while (textWidth > labelWidth && doc.getFontSize() > minSize) {
 			doc.setFontSize(doc.getFontSize() - 1);
 			textWidth = doc.getTextWidth(text);
 		}
