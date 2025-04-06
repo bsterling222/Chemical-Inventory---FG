@@ -181,5 +181,5 @@ button:disabled {
     width: 100%; /* Optional: Make it stretch across the container */
     box-sizing: border-box; /* Ensure padding doesn't overflow */
     margin-top: 20px;
-    margin-bottom: 20px; /* Optional: Adds space below the input field */
+    margin-bottom: 15px; /* Optional: Adds space below the input field */
 }
