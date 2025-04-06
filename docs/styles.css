@@ -52,7 +52,7 @@ body {
 
 /* Login input refined */
 .login-container input[type="text"] {
-	width: 100%;
+	width: 80%;
 	padding: 10px;
 	margin-bottom: 15px;
 	border-radius: 6px;
@@ -64,7 +64,7 @@ body {
 }
 
 button {
-	width: 110%;
+	width: 100%;
 	padding: 12px;
 	background-color: #00b3b3;
 	color: white;
