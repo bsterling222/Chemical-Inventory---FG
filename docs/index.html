@@ -655,6 +655,7 @@
         		const cas = item["CAS Number"] || "N/A";
         		const mfr = item["Manufacturer"] || "N/A";
         		const infoLine = `CAS: ${cas} | ${mfr}`;
+			const infoYOffset = y + 5 + nameLines.length * 4 + 1;
         		fitAndCenterText(doc, infoLine, x, labelWidth, y + 10, 7, 5, 'normal');
 
         		const barcodeYOffset = infoYOffset + 3;
