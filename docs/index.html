@@ -578,7 +578,7 @@
     		const labelHeight = 25.4;
     		const marginX = 4.7625;
     		const marginY = 12.7;
-    		const spacingX = 3.175;
+    		const spacingX = 3.2;
     		const spacingY = 0;
 
     		for (let i = 0; i < labelData.length; i++) {
@@ -594,7 +594,7 @@
         		JsBarcode(barcodeSvg, item["Barcode"], {
            			format: "CODE128",
             			displayValue: false,
-            			height: 15,
+            			height: 10,
             			width: 1.5,
             			margin: 0
         		});
@@ -622,7 +622,7 @@
         		// Centered label layout
         		fitAndCenterText(doc, item["Chemical Name"], x, labelWidth, y + 6);
 
-        		doc.setFont(undefined, 'normal');
+        		doc.setFont(defaultSize);
         		const cas = item["CAS Number"] || "N/A";
         		const mfr = item["Manufacturer"] || "N/A";
         		const infoLine = `CAS: ${cas} | ${mfr}`;
