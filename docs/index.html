@@ -36,16 +36,13 @@
 	<script>
   		window.jsPDF = window.jspdf.jsPDF;
 
-  		const robotoFontBase64 = 
-    		'AAEAAAASAQAABAAgR0RFRrRCsIIAAAgAAAAAAAAAAAPQAAAAE...'; // [TRUNCATED FOR BREVITY]
-
-  		// Register Roboto font with jsPDF
+  		const robotoFontBase64 = 'AAEAAAATAQAABAAwRFNJRwAAAAAAAAEAAAAVAAAAHEdERUYAAADgAAAAIAAAACBPUy8yAAABHAAAABgAAAAkY21hcAAAAVgAAAEeAAABYmdseWYAAAHoAAABMAAAADZnbHlmAAACcAAAAPQAAAFQaGVhZAAAAtkAAAE8AAAANmhoZWQAAALwAAAAMAAAACRobXR4AAADNAAAAEYAAAAYbG9jYQAABKAAAADQAAAAIG1heHAAABQIAAAABgAAAAgbmFtZQAABRgAAAE0AAABJnBvc3QAAAXEAAABNAAAAFV2ZXJzAAAGGAAAADUAAAAkZ1hZWiAAAAYAAAABAAAAAQAEAAMAAAABAAYAAwAEAAQAAQAAAAAAAAABAgAAAAEAAgACAAAAEgAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAD8zw==';
+	
   		jsPDF.API.events.push(['addFonts', function () {
-    		this.addFileToVFS('Roboto-Regular.ttf', robotoFontBase64);
-    		this.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
+    			this.addFileToVFS('Roboto-Regular.ttf', robotoFontBase64);
+    			this.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
   		}]);
 	</script>
-
 
 </head>
 <body>
