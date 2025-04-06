@@ -167,7 +167,7 @@ button:disabled {
 
 .search-chemicals input {
     margin-top: 30px;
-    margin-bottom: 30px; /* Optional: Adds space between search bar and button */
+    margin-bottom: 10px; /* Optional: Adds space between search bar and button */
 }
 
 .scan-barcode-container {
