@@ -451,10 +451,10 @@
 			inputStream: {
 				type: "LiveStream",
 				target: document.querySelector('#scanner'),
-				constraints: { facingMode: "environment" }
+				constraints: { facingMode: "environment"}
 			},
 			decoder: {
-				readers: ["code_128_reader", "ean_reader", "ean_8_reader", "upc_reader"]
+				readers: ["code_128_reader"]
 			}
 		}, function (err) {
 			if (err) {
@@ -485,6 +485,20 @@
 					time: new Date().toLocaleString()
 				};
 				updateAuditList();
+				const successMsg = document.createElement('div');
+				successMsg.textContent = `✅ Found: ${match["Chemical Name"]} (${code})`;
+				successMsg.style.position = "fixed";
+				successMsg.style.bottom = "20px";
+				successMsg.style.left = "50%";
+				successMsg.style.transform = "translateX(-50%)";
+				successMsg.style.background = "#4CAF50";
+				successMsg.style.color = "#fff";
+				successMsg.style.padding = "10px 20px";
+				successMsg.style.borderRadius = "5px";
+				successMsg.style.zIndex = "10000";
+				document.body.appendChild(successMsg);
+				setTimeout(() => successMsg.remove(), 3000);
+
 			} else if (!recentlyScanned.has(code)) {
 				recentlyScanned.add(code);
 				console.warn("Scanned barcode not found in inventory:", code);
@@ -503,10 +517,10 @@
 				msg.style.zIndex = "10000";
 				document.body.appendChild(msg);
 				setTimeout(() => msg.remove(), 3000);
-				}
-		
-			});
-		}
+			}
+				
+		});
+	}
 
 	function updateAuditList() {
     		const auditList = document.getElementById('audit-results');
