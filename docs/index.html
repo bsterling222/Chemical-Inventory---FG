@@ -637,21 +637,32 @@
         		const barcodeDataUrl = barcodeCanvas.toDataURL("image/png");
 
        			 // Layout configuration
-        		const nameTop = y + 4;
+			const nameTop = y + 4;
         		const nameLineHeight = 4;
         		const infoSpacing = 1.5;
         		const barcodeSpacing = 2;
         		const maxNameLines = 2;
 
         		// Chemical Name
-        		const nameLines = wrapText(doc, item["Chemical Name"], labelWidth).slice(0, maxNameLines);
-        		doc.setFont("helvetica", "bold");
-        		doc.setFontSize(9);
-        		nameLines.forEach((line, idx) => {
-            			const yOffset = nameTop + idx * nameLineHeight;
-            			const xOffset = x + (labelWidth - doc.getTextWidth(line)) / 2;
-            			doc.text(line, xOffset, yOffset);
-        		});
+        		// Auto-shrinking chemical name to fit within 2 lines
+			let fontSize = 9;
+			doc.setFont(undefined, "bold");
+			doc.setFontSize(fontSize);
+
+			let nameLines = wrapText(doc, item["Chemical Name"], labelWidth);
+			while (nameLines.length > 2 && fontSize > 6) {
+				fontSize -= 0.5;
+				doc.setFontSize(fontSize);
+				nameLines = wrapText(doc, item["Chemical Name"], labelWidth);
+			}
+
+			nameLines = nameLines.slice(0, 2); // always cap to 2 lines max
+
+			nameLines.forEach((line, idx) => {
+				const yOffset = nameTop + idx * nameLineHeight;
+				const xOffset = x + (labelWidth - doc.getTextWidth(line)) / 2;
+				doc.text(line, xOffset, yOffset);
+			});
 
         		// CAS Info
         		const cas = item["CAS Number"] || "N/A";
