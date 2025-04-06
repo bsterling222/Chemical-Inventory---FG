@@ -114,6 +114,7 @@
 <script>
 
 	let workingData = []; // stores uploaded data + barcodes
+	const robotoFontBase64 = 'AAEAAAATAQAABAAwRFNJRwAAAAAAAAEAAAAVAAAAHEdERUYAAADgAAAAIAAAACBPUy8yAAABHAAAABgAAAAkY21hcAAAAVgAAAEeAAABYmdseWYAAAHoAAABMAAAADZnbHlmAAACcAAAAPQAAAFQaGVhZAAAAtkAAAE8AAAANmhoZWQAAALwAAAAMAAAACRobXR4AAADNAAAAEYAAAAYbG9jYQAABKAAAADQAAAAIG1heHAAABQIAAAABgAAAAgbmFtZQAABRgAAAE0AAABJnBvc3QAAAXEAAABNAAAAFV2ZXJzAAAGGAAAADUAAAAkZ1hZWiAAAAYAAAABAAAAAQAEAAMAAAABAAYAAwAEAAQAAQAAAAAAAAABAgAAAAEAAgACAAAAEgAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAD8zw==';
 
 
 	// Sample chemicalData (optional/fallback)
@@ -597,6 +598,11 @@
 			format: "letter"
 		});
 
+		// 🔥 Register Roboto in this PDF instance
+		doc.addFileToVFS("Roboto-Regular.ttf", robotoFontBase64);
+		doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
+		doc.setFont("Roboto", "normal");
+		
 		const labelsPerRow = 3;
 		const labelsPerColumn = 10;
 		const labelWidth = 66.675;
