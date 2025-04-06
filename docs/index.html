@@ -553,6 +553,23 @@
 		doc.text(text, startX, y);
 	}
 
+	function wrapText(doc, text, maxWidth, maxCharsPerLine = 30) {
+		const words = text.split(" ");
+		let lines = [];
+		let currentLine = words[0];
+
+		for (let i = 1; i < words.length; i++) {
+			const testLine = currentLine + " " + words[i];
+			if (doc.getTextWidth(testLine) < maxWidth && testLine.length <= maxCharsPerLine){
+				currentLine = testLine;
+			} else {
+				lines.push(currentLine);
+				currentLine = words[i];
+			}
+		}
+		lines.push(currentLine);
+		return lines;
+	}
 
 	async function generateLabels() {
     		// 🔹 Get all selected checkboxes
@@ -580,7 +597,7 @@
     		const labelWidth = 66.675;
     		const labelHeight = 25.4;
     		const marginX = 3.8;
-    		const marginY = 12.7;
+    		const marginY = 12.3;
     		const spacingX = 4.175;
     		const spacingY = 0.2;
 
@@ -624,17 +641,33 @@
         		const barcodeDataUrl = barcodeCanvas.toDataURL("image/png");
 
         		// Centered label layout
-        		fitAndCenterText(doc, item["Chemical Name"], x, labelWidth, y + 6);
+        		doc.setFont(undefined, "bold");
+			doc.setFontSize(9);
+			const nameLines = wrapText(doc, item["Chemical Name"], labelWidth);
+			nameLines.forEach((line, idx) => {
+				const yOffset = y + 5 + idx * 4;
+				const xOffset = x + (labelWidth - doc.getTextWidth(line)) / 2;
+				doc.text(line, xOffset, yOffset);
+			});
 
         		doc.setFont(undefined, "normal"); // Optional: sets font family and style
-			doc.setFontSize(7)
+			doc.setFontSize(8)
         		const cas = item["CAS Number"] || "N/A";
         		const mfr = item["Manufacturer"] || "N/A";
         		const infoLine = `CAS: ${cas} | ${mfr}`;
         		fitAndCenterText(doc, infoLine, x, labelWidth, y + 10, 7, 5, 'normal');
 
-        		const barcodeWidth = 40;
-			doc.addImage(barcodeDataUrl, "PNG", x + (labelWidth - barcodeWidth) / 2, y + 13, barcodeWidth, 10);
+        		const barcodeYOffset = infoYOffset + 3;
+			const barcodeWidth = 40;
+			const barcodeHeight = 10;  // ← 🔧 You can adjust this too
+			doc.addImage(
+				barcodeDataUrl,
+				"PNG",
+				x + (labelWidth - barcodeWidth) / 2,
+				barcodeYOffset,
+				barcodeWidth,
+				barcodeHeight
+			);
 			//doc.setDrawColor(200); // Light gray
 			//doc.rect(x, y, labelWidth, labelHeight);
 
