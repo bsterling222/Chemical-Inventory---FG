@@ -588,10 +588,11 @@
         		const item = labelData[i];
 
         		const row = Math.floor((i % (labelsPerRow * labelsPerColumn)) / labelsPerRow);
-        		const col = i % labelsPerRow;
+			const col = i % labelsPerRow;
 
-        		const spacingX = 3.175;
-        		const y = marginY + row * (labelHeight + spacingY);
+			const x = marginX + col * (labelWidth + spacingX); // ← Restore this line
+			const y = marginY + row * (labelHeight + spacingY);
+
 
         		const barcodeSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         		JsBarcode(barcodeSvg, item["Barcode"], {
