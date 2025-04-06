@@ -32,6 +32,21 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
+	<!-- Roboto font -->
+	<script>
+  		window.jsPDF = window.jspdf.jsPDF;
+
+  		const robotoFontBase64 = 
+    		'AAEAAAASAQAABAAgR0RFRrRCsIIAAAgAAAAAAAAAAAPQAAAAE...'; // [TRUNCATED FOR BREVITY]
+
+  		// Register Roboto font with jsPDF
+  		jsPDF.API.events.push(['addFonts', function () {
+    		this.addFileToVFS('Roboto-Regular.ttf', robotoFontBase64);
+    		this.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
+  		}]);
+	</script>
+
+
 </head>
 <body>
 
@@ -632,7 +647,7 @@
 
 			const barcodeDataUrl = barcodeCanvas.toDataURL("image/png");
 
-			// Layout variables
+			// Layout
 			const nameTop = y + 4;
 			const nameLineHeight = 4;
 			const infoSpacing = 1.5;
@@ -641,9 +656,9 @@
 			const barcodeHeight = 5;
 			const maxNameLines = 2;
 
-			// Chemical Name with autoshrink and wrapping
+			// Chemical Name
 			let fontSize = 9;
-			doc.setFont("helvetica", "bold");
+			doc.setFont("Roboto", "normal");
 			doc.setFontSize(fontSize);
 
 			let nameLines = wrapText(doc, item["Chemical Name"], labelWidth);
@@ -664,16 +679,15 @@
 			const cas = item["CAS Number"] || "N/A";
 			const infoLine = `CAS: ${cas}`;
 			const infoYOffset = nameTop + nameLines.length * nameLineHeight + infoSpacing;
-			doc.setFont("helvetica", "normal");
+			doc.setFont("Roboto", "normal");
 			doc.setFontSize(7);
 			const casTextWidth = doc.getTextWidth(infoLine);
 			doc.text(infoLine, x + (labelWidth - casTextWidth) / 2, infoYOffset);
 
-			// Barcode position
+			// Barcode image
 			const barcodeYOffset = infoYOffset + barcodeSpacing;
 			const maxBarcodeYOffset = y + labelHeight - barcodeHeight - 4;
 			const finalBarcodeYOffset = Math.min(barcodeYOffset, maxBarcodeYOffset);
-
 			doc.addImage(
 				barcodeDataUrl,
 				"PNG",
@@ -690,12 +704,12 @@
 			const barcodeTextWidth = doc.getTextWidth(barcodeText);
 			doc.text(barcodeText, x + (labelWidth - barcodeTextWidth) / 2, barcodeTextYOffset);
 
-			// Optional: Draw label border for testing
+			// Optional: label border
 			// doc.setDrawColor(200);
 			// doc.rect(x, y, labelWidth, labelHeight);
 
 			if ((i + 1) % 30 === 0 && i + 1 < labelData.length) {
-				doc.addPage();
+			doc.addPage();
 			}
 		}
 
