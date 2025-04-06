@@ -571,6 +571,8 @@
     		// 🔹 Continue the rest of the label generation using labelData
     		const { jsPDF } = window.jspdf;
 		const doc = new jsPDF({
+			unit: "mm",
+			format: "letter"
 		});
 
     		const labelsPerRow = 3;
@@ -621,7 +623,7 @@
         		const barcodeDataUrl = barcodeCanvas.toDataURL("image/png");
 
         		// Centered label layout
-        		fitAndCenterText(doc, item["Chemical Name"], x, labelWidth, y + 6);
+        		fitAndCenterText(doc, item["Chemical Name"],labelWidth, y + 6);
 
         		doc.setFont(undefined, "normal"); // Optional: sets font family and style
 			doc.setFontSize(7)
