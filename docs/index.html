@@ -569,8 +569,10 @@
     		}
 
     		// 🔹 Continue the rest of the label generation using labelData
-    		const { jsPDF } = window.jspdf;
-    		const doc = new jsPDF();
+    		const doc = new jsPDF({
+			unit: "mm",
+			format: "letter" // US Letter for Avery 5160
+		});
 
     		const labelsPerRow = 3;
     		const labelsPerColumn = 10;
@@ -578,7 +580,7 @@
     		const labelHeight = 25.4;
     		const marginX = 4.7625;
     		const marginY = 12.7;
-    		const spacingX = 3.2;
+    		const spacingX = 3.175;
     		const spacingY = 0;
 
     		for (let i = 0; i < labelData.length; i++) {
@@ -626,9 +628,12 @@
         		const cas = item["CAS Number"] || "N/A";
         		const mfr = item["Manufacturer"] || "N/A";
         		const infoLine = `CAS: ${cas} | ${mfr}`;
-        		fitAndCenterText(doc, infoLine, x, labelWidth, y + 10);
+        		fitAndCenterText(doc, infoLine, x, labelWidth, y + 10, 7, 5, 'normal');
 
-        		doc.addImage(barcodeDataUrl, "PNG", x + (labelWidth - 50) / 2, y + 13, 50, 10);
+        		const barcodeWidth = 40;
+			doc.addImage(barcodeDataUrl, "PNG", x + (labelWidth - barcodeWidth) / 2, y + 13, barcodeWidth, 10);
+			doc.setDrawColor(200); // Light gray
+			doc.rect(x, y, labelWidth, labelHeight);
 
         		if ((i + 1) % 30 === 0 && i + 1 < labelData.length) {
            			doc.addPage();
