@@ -623,7 +623,8 @@
         		// Centered label layout
         		fitAndCenterText(doc, item["Chemical Name"], x, labelWidth, y + 6);
 
-        		doc.setFont(defaultSize);
+        		doc.setFont(undefined, "normal"); // Optional: sets font family and style
+			doc.setFontSize(7)
         		const cas = item["CAS Number"] || "N/A";
         		const mfr = item["Manufacturer"] || "N/A";
         		const infoLine = `CAS: ${cas} | ${mfr}`;
