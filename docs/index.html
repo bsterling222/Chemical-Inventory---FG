@@ -572,12 +572,10 @@
 	}
 
 	async function generateLabels() {
-    		// 🔹 Get all selected checkboxes
     		const selectedIndexes = Array.from(document.querySelectorAll('.label-checkbox'))
         		.filter(cb => cb.checked)
         		.map(cb => parseInt(cb.dataset.index));
 
-    		// 🔹 Build a filtered list of selected chemicals
     		const labelData = selectedIndexes.map(i => workingData[i]);
 
     		if (labelData.length === 0) {
@@ -585,12 +583,11 @@
         		return;
     		}
 
-    		// 🔹 Continue the rest of the label generation using labelData
     		const { jsPDF } = window.jspdf;
-		const doc = new jsPDF({
-			unit: "mm",
-			format: "letter"
-		});
+    		const doc = new jsPDF({
+        		unit: "mm",
+        		format: "letter"
+    		});
 
     		const labelsPerRow = 3;
     		const labelsPerColumn = 10;
@@ -605,15 +602,14 @@
         		const item = labelData[i];
 
         		const row = Math.floor((i % (labelsPerRow * labelsPerColumn)) / labelsPerRow);
-			const col = i % labelsPerRow;
+        		const col = i % labelsPerRow;
 
-			const x = marginX + col * (labelWidth + spacingX); // ← Restore this line
-			const y = marginY + row * (labelHeight + spacingY);
-
+        		const x = marginX + col * (labelWidth + spacingX);
+        		const y = marginY + row * (labelHeight + spacingY);
 
         		const barcodeSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         		JsBarcode(barcodeSvg, item["Barcode"], {
-           			format: "CODE128",
+            			format: "CODE128",
             			displayValue: false,
             			height: 10,
             			width: 1.5,
@@ -629,7 +625,7 @@
         		await new Promise(resolve => {
             			img.onload = function () {
                 			const ctx = barcodeCanvas.getContext("2d");
-               				barcodeCanvas.width = img.width;
+                			barcodeCanvas.width = img.width;
                 			barcodeCanvas.height = img.height;
                 			ctx.drawImage(img, 0, 0);
                 			URL.revokeObjectURL(url);
@@ -640,47 +636,57 @@
 
         		const barcodeDataUrl = barcodeCanvas.toDataURL("image/png");
 
-        		// Centered label layout
-        		doc.setFont(undefined, "bold");
-			doc.setFontSize(9);
-			const nameLines = wrapText(doc, item["Chemical Name"], labelWidth);
-			nameLines.forEach((line, idx) => {
-				const yOffset = y + 5 + idx * 4;
-				const xOffset = x + (labelWidth - doc.getTextWidth(line)) / 2;
-				doc.text(line, xOffset, yOffset);
-			});
+       			 // Layout configuration
+        		const nameTop = y + 4;
+        		const nameLineHeight = 4;
+        		const infoSpacing = 1.5;
+        		const barcodeSpacing = 2;
+        		const maxNameLines = 2;
 
-        		doc.setFont(undefined, "normal"); // Optional: sets font family and style
-			doc.setFontSize(8)
+        		// Chemical Name
+        		const nameLines = wrapText(doc, item["Chemical Name"], labelWidth).slice(0, maxNameLines);
+        		doc.setFont("helvetica", "bold");
+        		doc.setFontSize(9);
+        		nameLines.forEach((line, idx) => {
+            			const yOffset = nameTop + idx * nameLineHeight;
+            			const xOffset = x + (labelWidth - doc.getTextWidth(line)) / 2;
+            			doc.text(line, xOffset, yOffset);
+        		});
+
+        		// CAS Info
         		const cas = item["CAS Number"] || "N/A";
         		const mfr = item["Manufacturer"] || "N/A";
         		const infoLine = `CAS: ${cas} | ${mfr}`;
-			const infoYOffset = y + 5 + nameLines.length * 4 + 1;
-        		fitAndCenterText(doc, infoLine, x, labelWidth, y + 10, 7, 5, 'normal');
+        		const infoYOffset = nameTop + nameLines.length * nameLineHeight + infoSpacing;
+        		fitAndCenterText(doc, infoLine, x, labelWidth, infoYOffset, 7, 5, 'normal');
 
-        		const barcodeYOffset = infoYOffset + 3;
-			const barcodeWidth = 40;
-			const barcodeHeight = 10;  // ← 🔧 You can adjust this too
-			doc.addImage(
-				barcodeDataUrl,
-				"PNG",
-				x + (labelWidth - barcodeWidth) / 2,
-				barcodeYOffset,
-				barcodeWidth,
-				barcodeHeight
-			);
-			//doc.setDrawColor(200); // Light gray
-			//doc.rect(x, y, labelWidth, labelHeight);
+        		// Barcode
+        		const barcodeYOffset = infoYOffset + barcodeSpacing;
+        		const barcodeWidth = 40;
+        		const barcodeHeight = 10;
+        		const maxBarcodeYOffset = y + labelHeight - barcodeHeight - 1;
+        		const finalBarcodeYOffset = Math.min(barcodeYOffset, maxBarcodeYOffset);
+        		doc.addImage(
+            			barcodeDataUrl,
+            			"PNG",
+            			x + (labelWidth - barcodeWidth) / 2,
+           			finalBarcodeYOffset,
+            			barcodeWidth,
+            			barcodeHeight
+        		);
+
+        		// Optional: Draw label boundary for testing
+        		// doc.setDrawColor(200);
+        		// doc.rect(x, y, labelWidth, labelHeight);
 
         		if ((i + 1) % 30 === 0 && i + 1 < labelData.length) {
-           			doc.addPage();
+            			doc.addPage();
         		}
     		}
 
     		const today = new Date().toISOString().slice(0, 10);
     		doc.save(`Chemical_Labels_${today}.pdf`);
 	}
-
 
 	if ('serviceWorker' in navigator) {
  		navigator.serviceWorker.register('service-worker.js').then(() => {
