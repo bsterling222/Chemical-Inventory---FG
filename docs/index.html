@@ -65,10 +65,10 @@
 			<button onclick="generateLabels()" style="margin-top: 30px;">
     			🏷️ Generate Labels
 			</button>
-			<div id="excel-preview" style="margin-top: 20px;"></div>
 			<button onclick="clearFile()" style="margin-top: 10px;">
 				🧹 Clear File & Table
 			</button>
+			<div id="excel-preview" style="margin-top: 20px;"></div>
 		</div>
 	</div>
    <!-- Inventory Audit -->
@@ -146,8 +146,8 @@
 	}
 
 	function clearFile() {
-  		const input = document.getElementById('excel-file');
-  		fileInput.value="";
+  		const fileInput = document.getElementById('excel-file');
+  		fileInput.value = "";
 		const preview = document.getElementId('excel-preview');
 		preview.innerHTML = "";
 	}
