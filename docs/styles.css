@@ -1,6 +1,6 @@
 body {
 	font-family: 'Roboto', sans-serif;
-	background-color: #B4B4B4;
+	background-color: #403D3D;
 	color: #1a1a1a; /* Darker text for contrast on lighter grey */
 	display: flex;
 	justify-content: center;
@@ -24,7 +24,7 @@ body {
 .page-title {
 	text-align: center;
 	padding: 20px 0;
-	background-color: #494848;
+	background-color: #403D3D;
 	box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 	width: 100%;
 	position: fixed;
