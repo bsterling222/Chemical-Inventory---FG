@@ -424,6 +424,11 @@
 	}
 
 	function scanAuditBarcode() {
+
+		if (workingData.length === 0) {
+			alert("⚠️ No inventory data loaded. Please upload the Excel file first.");
+			return;
+		}
 		const scannerOverlay = document.createElement('div');
 		scannerOverlay.id = 'scanner-overlay';
 		scannerOverlay.style = `
