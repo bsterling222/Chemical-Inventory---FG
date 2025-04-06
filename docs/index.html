@@ -623,7 +623,7 @@
         		const barcodeDataUrl = barcodeCanvas.toDataURL("image/png");
 
         		// Centered label layout
-        		fitAndCenterText(doc, item["Chemical Name"],labelWidth, y + 6);
+        		fitAndCenterText(doc, item["Chemical Name"], x, labelWidth, y + 6);
 
         		doc.setFont(undefined, "normal"); // Optional: sets font family and style
 			doc.setFontSize(7)
