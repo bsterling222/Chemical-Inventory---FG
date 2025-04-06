@@ -317,19 +317,24 @@
             	document.getElementById('display-name').textContent = username;
 	}	
 	
-	document.addEventListener('DOMContentLoaded', () => {
-		const usernameInput = document.getElementById("username");
-		usernameInput.addEventListener("keydown", function(event) {
-			if (event.key === "Enter") {
-				event.preventDefault();
-				loginUser();
-			}
-		});		
-		// ✅ Add this to bind the login button
-		const loginBtn = document.getElementById("login-btn");
-		if (loginBtn) {
-			loginBtn.addEventListener("click", loginUser);
-		}
+	document.addEventListener("DOMContentLoaded", () => {
+    		const storedUsers = localStorage.getItem("allowedUsers");
+    		if (storedUsers) {
+       			allowedUsers = JSON.parse(storedUsers);
+    		}
+
+    		const usernameInput = document.getElementById("username");
+    		usernameInput.addEventListener("keydown", function(event) {
+        		if (event.key === "Enter") {
+            			event.preventDefault();
+            			loginUser();
+        		}
+    		});
+
+    		const loginBtn = document.getElementById("login-btn");
+    		if (loginBtn) {
+        		loginBtn.addEventListener("click", loginUser);
+    		}
 	});
 
 	function searchChemicals() {
