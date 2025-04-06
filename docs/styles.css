@@ -1,12 +1,13 @@
 body {
 	font-family: 'Roboto', sans-serif;
-	background-color: #f0f0f0; /* Lighter grey background */
+	background-color: #e0e0e0; /* Slightly darker grey background */
 	color: #2a2a2a;
 	display: flex;
 	justify-content: center;
 	align-items: flex-start;
-	padding-top: 100px; /* More padding to move login down from header */
+	padding-top: 60px;
 	margin: 0;
+	min-height: 100vh;
 }
 
 .page-title {
@@ -29,26 +30,45 @@ body {
 
 .login-container {
 	background-color: #ffffff;
-	padding: 30px 20px;
-	border-radius: 10px;
-	box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+	padding: 25px;
+	border-radius: 12px;
+	box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 	width: 90%;
-	max-width: 360px;
-	margin: 0 auto;
+	max-width: 320px;
+	margin: 100px auto 20px auto;
 	text-align: center;
-	position: relative;
 }
 
 .login-container h2 {
 	margin-bottom: 20px;
 	font-size: 22px;
-	color: #2a2a2a;
+	color: #333;
 }
 
-.login-container input[type="text"] {
+input[type="text"] {
 	width: 100%;
-	max-width: 280px;
-	margin: 0 auto 15px;
+	padding: 10px;
+	margin-bottom: 15px;
+	border-radius: 6px;
+	border: 1px solid #ccc;
+	font-size: 16px;
+	text-align: center;
+}
+
+button {
+	width: 100%;
+	padding: 12px;
+	background-color: #333333;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 16px;
+	transition: background-color 0.3s ease;
+}
+
+button:hover {
+	background-color: #4a4a4a;
 }
 
 .home-container,
@@ -70,24 +90,10 @@ body {
 	margin-top: 25px;
 }
 
-.actions-container button,
-button {
+.actions-container button {
 	width: 100%;
-	padding: 12px;
-	background-color: #333333;
-	color: white;
-	border: none;
-	border-radius: 6px;
-	cursor: pointer;
-	font-size: 16px;
 }
 
-.actions-container button:hover,
-button:hover {
-	background-color: #4a4a4a;
-}
-
-input[type="text"],
 input[type="file"] {
 	width: 100%;
 	padding: 10px;
