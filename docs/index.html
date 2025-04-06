@@ -569,7 +569,8 @@
     		}
 
     		// 🔹 Continue the rest of the label generation using labelData
-    		const doc = new jsPDF({
+    		const { jsPDF } = window.jspdf;
+		const doc = new jsPDF({
 		});
 
     		const labelsPerRow = 3;
