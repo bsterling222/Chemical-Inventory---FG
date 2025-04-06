@@ -626,7 +626,7 @@
         		const cas = item["CAS Number"] || "N/A";
         		const mfr = item["Manufacturer"] || "N/A";
         		const infoLine = `CAS: ${cas} | ${mfr}`;
-        		fitandCenterText(doc, infoLine, x, labelWidth, y + 10);
+        		fitAndCenterText(doc, infoLine, x, labelWidth, y + 10);
 
         		doc.addImage(barcodeDataUrl, "PNG", x + (labelWidth - 50) / 2, y + 13, 50, 10);
 
