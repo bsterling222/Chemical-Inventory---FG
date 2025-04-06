@@ -547,7 +547,7 @@
 		while (textWidth > width && doc.getFontSize() > minSize) {
 			doc.setFontSize(doc.getFontSize() - 0.5);  // finer adjustment
 			textWidth = doc.getTextWidth(text);
-		}
+		}8:59 PM 4/5/2025
 
 		const startX = x + (width - textWidth) / 2;
 		doc.text(text, startX, y);
@@ -626,7 +626,7 @@
         		const cas = item["CAS Number"] || "N/A";
         		const mfr = item["Manufacturer"] || "N/A";
         		const infoLine = `CAS: ${cas} | ${mfr}`;
-        		centerText(doc, infoLine, x, labelWidth, y + 10);
+        		fitandCenterText(doc, infoLine, x, labelWidth, y + 10);
 
         		doc.addImage(barcodeDataUrl, "PNG", x + (labelWidth - 50) / 2, y + 13, 50, 10);
 
