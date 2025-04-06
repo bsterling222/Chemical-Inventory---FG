@@ -553,7 +553,7 @@
 		doc.text(text, startX, y);
 	}
 
-	function wrapText(doc, text, maxWidth) {
+	function wrapText(doc, text, maxWidth, maxCharsPerLine = 22) {
 		const words = text.split(" ");
 		const lines = [];
 		let currentLine = "";
@@ -562,14 +562,14 @@
 			let word = words[i];
 			let testLine = currentLine ? currentLine + " " + word : word;
 
-			if (doc.getTextWidth(testLine) < maxWidth) {
+			if (doc.getTextWidth(testLine) < maxWidth && testLine.length <= maxCharsPerLine) {
 			currentLine = testLine;
 			} else {
 				if (currentLine) lines.push(currentLine);
 				// If word is too long by itself, break it up
-				while (doc.getTextWidth(word) > maxWidth) {
-					let cutoff = word.length;
-					while (cutoff > 0 && doc.getTextWidth(word.slice(0, cutoff)) > maxWidth) {
+				while (doc.getTextWidth(word) > maxWidth || word.length > maxCharsPerLine) {
+					let cutoff = Math.min(word.length, maxCharsPerLine);
+					while (cutoff > 0 && (doc.getTextWidth(word.slice(0, cutoff)) > maxWidth || cutoff > maxCharsPerLine)) {
 						cutoff--;
 					}
 					lines.push(word.slice(0, cutoff));
