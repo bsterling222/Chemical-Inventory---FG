@@ -579,9 +579,9 @@
     		const labelsPerColumn = 10;
     		const labelWidth = 66.675;
     		const labelHeight = 25.4;
-    		const marginX = 4.7625;
+    		const marginX = 4;
     		const marginY = 12.7;
-    		const spacingX = 3.175;
+    		const spacingX = 3.3;
     		const spacingY = 0;
 
     		for (let i = 0; i < labelData.length; i++) {
@@ -635,8 +635,8 @@
 
         		const barcodeWidth = 40;
 			doc.addImage(barcodeDataUrl, "PNG", x + (labelWidth - barcodeWidth) / 2, y + 13, barcodeWidth, 10);
-			doc.setDrawColor(200); // Light gray
-			doc.rect(x, y, labelWidth, labelHeight);
+			//doc.setDrawColor(200); // Light gray
+			//doc.rect(x, y, labelWidth, labelHeight);
 
         		if ((i + 1) % 30 === 0 && i + 1 < labelData.length) {
            			doc.addPage();
