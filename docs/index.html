@@ -588,7 +588,7 @@
         		const row = Math.floor((i % (labelsPerRow * labelsPerColumn)) / labelsPerRow);
         		const col = i % labelsPerRow;
 
-        		const x = marginX + col * (labelWidth + spacingX);
+        		const spacingX = 3.175;
         		const y = marginY + row * (labelHeight + spacingY);
 
         		const barcodeSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
