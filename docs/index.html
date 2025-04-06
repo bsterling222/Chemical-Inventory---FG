@@ -100,7 +100,7 @@
 			
     			<ul id="search-results"></ul>
 		</div>
-	<div/>
+	</div>
     <!-- Scripts -->
 <script>
 
@@ -454,7 +454,6 @@
 		}, function (err) {
 			if (err) {
 				alert("Failed to start scanner: " + err);
-				stopScanner();
 				return;
 			}
 			Quagga.start();
@@ -499,9 +498,9 @@
 				msg.style.zIndex = "10000";
 				document.body.appendChild(msg);
 				setTimeout(() => msg.remove(), 3000);
-			}
+				}
 		
-		});
+			});
 
 	function updateAuditList() {
     		const auditList = document.getElementById('audit-results');
@@ -679,7 +678,7 @@
 
 			// Chemical Name
 			let fontSize = 9;
-			doc.setFont("Roboto", "normal");
+			doc.setFont(undefined, "normal");
 			doc.setFontSize(fontSize);
 
 			let nameLines = wrapText(doc, item["Chemical Name"], labelWidth);
@@ -700,7 +699,7 @@
 			const cas = item["CAS Number"] || "N/A";
 			const infoLine = `CAS: ${cas}`;
 			const infoYOffset = nameTop + nameLines.length * nameLineHeight + infoSpacing;
-			doc.setFont("Roboto", "normal");
+			doc.setFont(undefined, "normal");
 			doc.setFontSize(7);
 			const casTextWidth = doc.getTextWidth(infoLine);
 			doc.text(infoLine, x + (labelWidth - casTextWidth) / 2, infoYOffset);
