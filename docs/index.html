@@ -538,20 +538,19 @@
     	URL.revokeObjectURL(url);
 	}
 
-	function centerText(doc, text, labelX, labelWidth, y) {
-    		const textWidth = doc.getTextWidth(text);
-    		const centerX = labelX + (labelWidth / 2) - (textWidth / 2);
-    		doc.text(text, centerX, y);
-	}
-
-	function fitText(doc, text, maxWidth, defaultSize = 10, minSize = 4) {
+	function fitAndCenterText(doc, text, x, width, y, defaultSize = 10, minSize = 6, fontStyle = 'bold') {
+		doc.setFont(undefined, fontStyle);
 		doc.setFontSize(defaultSize);
 		let textWidth = doc.getTextWidth(text);
 
-		while (textWidth > labelWidth && doc.getFontSize() > minSize) {
-			doc.setFontSize(doc.getFontSize() - 1);
+		// Reduce font size until it fits or we hit minSize
+		while (textWidth > width && doc.getFontSize() > minSize) {
+			doc.setFontSize(doc.getFontSize() - 0.5);  // finer adjustment
 			textWidth = doc.getTextWidth(text);
 		}
+
+		const startX = x + (width - textWidth) / 2;
+		doc.text(text, startX, y);
 	}
 
 
@@ -621,9 +620,7 @@
         		const barcodeDataUrl = barcodeCanvas.toDataURL("image/png");
 
         		// Centered label layout
-        		doc.setFont(undefined, 'bold');
-			fitText(doc, item["Chemical Name"], labelWidth);  // Adjust font size to fit
-			centerText(doc, item["Chemical Name"], x, labelWidth, y + 6);
+        		fitAndCenterText(doc, item["Chemical Name"], x, labelWidth, y + 6);
 
         		doc.setFont(undefined, 'normal');
         		const cas = item["CAS Number"] || "N/A";
