@@ -62,15 +62,9 @@
 		<div style="margin-top: 40px;">
     			<h3>Upload Chemical Inventory Excel</h3>
     			<input type="file" id="excel-file" accept=".xlsx, .xls, .csv" onchange="handleFileUpload(event)" />
-			<button onclick="downloadModifiedFile()" style="margin-top: 30px;">
-    				💾 Download File with Barcodes
-			</button>
-			<button onclick="generateLabels()" style="margin-top: 30px;">
-    			🏷️ Generate Labels
-			</button>
-			<button onclick="clearFile()" style="margin-top: 10px;">
-				🧹 Clear File & Table
-			</button>
+			<button class="full-width-button" onclick="downloadModifiedFile()">💾 Download File with Barcodes</button>
+			<button class="full-width-button" onclick="generateLabels()">🏷️ Generate Labels</button>
+			<button class="full-width-button" onclick="clearFile()">🧹 Clear File & Table</button>
 			<div id="excel-preview" style="margin-top: 20px;"></div>
 		</div>
 	</div>
