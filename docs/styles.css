@@ -161,7 +161,7 @@ button:disabled {
 .search-chemicals {
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Add more space between the elements */
+    gap: 30px; /* Add more space between the elements */
     width: 100%;
 }
 
